@@ -40,6 +40,7 @@
 				<include name="de.bsvrz.dav.daf/**/*.jar"/>
 				<include name="de.bsvrz.sys.funclib.debug/**/*.jar"/>
 				<include name="de.bsvrz.sys.funclib.commandLineArgs/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.concurrent/**/*.jar"/>
 				<include name="de.bsvrz.sys.funclib.hexdump/**/*.jar"/>
 				<include name="de.bsvrz.kex.tls.osi2osi3/**/*.jar"/>
 				<include name="de.bsvrz.pat.onlprot/**/*.jar"/>
