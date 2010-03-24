@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Copyright (c) 2010 by inovat, Dipl.-Ing. H. C. Kniß
+  ~ ALL RIGHTS RESERVED.
+  ~
+  ~ THIS SOFTWARE IS  PROVIDED  "AS IS"  AND ANY EXPRESSED OR IMPLIED
+  ~ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+  ~ OF  MERCHANTABILITY  AND  FITNESS  FOR  A PARTICULAR  PURPOSE ARE
+  ~ DISCLAIMED. IN NO EVENT SHALL inovat OR ITS CONTRIBUTORS BE
+  ~ LIABLE FOR ANY  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+  ~ OR CONSEQUENTIAL DAMAGES  (INCL., BUT NOT LIMITED TO, PROCUREMENT
+  ~ OF SUBSTITUTE GOODS OR SERVICES;  LOSS OF USE, DATA, OR  PROFITS;
+  ~ OR BUSINESS INTERRUPTION)  HOWEVER  CAUSED  AND  ON ANY THEORY OF
+  ~ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,  OR TORT (INCL.
+  ~ NEGLIGENCE OR OTHERWISE)  ARISING  IN  ANY  WAY OUT OF THE USE OF
+  ~ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  ~
+  ~ $Revision: 387 $
+  ~ $Date: 2009-12-07 17:49:54 +0100 (Mo, 07 Dez 2009) $
+  ~ $Author: HCK $
+  -->
+<project name="SWE: de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip" default="build-swe" basedir=".">
+
+	<!-- Angabe der Lizenzen für diese SWE, mögliche Werte: "BEIBEHALTEN", "INOVAT", "GPL", "LGPL"  -->
+	<property name="swe-lizenz" value="GPL"/>
+	<!-- Legt fest, ob eventuell vorhanden Testsourcen in der Distribution vorhanden sein sollen.   -->
+	<property name="test-sourcen-verwenden" value="nein"/>
+
+	<!-- Angabe der benötigten Sourcen für diese SWE -->
+	<target name="src">
+		<hole-src>
+			<fileset dir="./src/" includes="**"/>
+		</hole-src>
+	</target>
+
+	<!-- Angabe der benötigten externen Libs für diese SWE -->
+	<target name="externe-libs">
+		<hole-externe-libs>
+			<fileset dir="${dir.libs.extern}">
+				<include name="de.bsvrz.dav.daf/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.debug/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.commandLineArgs/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.hexdump/**/*.jar"/>
+				<include name="de.bsvrz.kex.tls.osi2osi3/**/*.jar"/>
+				<include name="de.bsvrz.pat.onlprot/**/*.jar"/>
+				<!--
+				<include name="de.bsvrz.dav.dav/**/*.jar"/>
+				<include name="de.bsvrz.puk.config/**/*.jar"/>
+				<include name="de.bsvrz.pat.datgen/**/*.jar"/>
+				<include name="de.bsvrz.pat.sysbed/**/*.jar"/>
+				<include name="de.bsvrz.pat.sysprot/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.application/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.asyncReceiver/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.communicationStreams/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.concurrent/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.configObjectAcquisition/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.consoleProcessFrame/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.crypt/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.dataIdentificationSettings/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.dataSerializer/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.filelock/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.operatingMessage/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.timeout/**/*.jar"/>
+				<include name="de.bsvrz.sys.funclib.xmlSupport/**/*.jar"/>
+				<include name="de.kappich.pat.configBrowser/**/*.jar"/>
+				<include name="de.kappich.puk.param/**/*.jar"/>
+				<include name="de.kappich.samples.operatingMessage/**/*.jar"/>
+				<include name="de.kappich.sys.funclib.profile/**/*.jar"/>
+				<include name="de.kappich.tools.sleep/**/*.jar"/>
+				<include name="de.kappich.vew.bmvew/**/*.jar"/>
+				-->
+			</fileset>
+		</hole-externe-libs>
+	</target>
+
+	<!-- Angabe der benötigten globalen Libs für diese SWE -->
+	<target name="globale-libs">
+		<hole-globale-libs>
+			<fileset dir="${dir.libs.global}">
+				<include name="global.junit/**/*.jar"/>
+			</fileset>
+		</hole-globale-libs>
+	</target>
+
+	<!-- Angabe der benötigten TestSourcen für diese SWE  -->
+	<!-- Die Testsourcen werden nur verwendet, wenn das   -->
+	<!-- Property "test-sourcen-verwenden" auf "ja" steht.-->
+	<!-- Damit kann die Auslieferung der Testsourcen      -->
+	<!-- einfach ein- und ausgeschaltet werden.           -->
+	<target name="test">
+		<hole-test>
+			<fileset dir="./test/" includes="**"/>
+		</hole-test>
+	</target>
+
+	<import file="../../ant/build-swe.xml"/>
+</project>
