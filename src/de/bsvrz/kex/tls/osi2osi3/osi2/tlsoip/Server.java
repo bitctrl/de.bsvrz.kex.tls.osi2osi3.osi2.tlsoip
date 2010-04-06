@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 by inovat, innovative systeme - verkehr - tunnel - technik, Dipl.-Ing. H. C. Kniß
+ * Copyright (c) 2010 by inovat, innovative systeme - verkehr - tunnel - technik, Dipl.-Ing. H. C. Kniß
  * ALL RIGHTS RESERVED.
  *
  * THIS SOFTWARE IS  PROVIDED  "AS IS"  AND ANY EXPRESSED OR IMPLIED
@@ -40,6 +40,7 @@ import de.bsvrz.sys.funclib.concurrent.PriorityChannel;
 import de.bsvrz.sys.funclib.concurrent.PriorizedObject;
 import de.bsvrz.sys.funclib.concurrent.UnboundedQueue;
 import de.bsvrz.sys.funclib.debug.Debug;
+import de.bsvrz.sys.funclib.hexdump.HexDumper;
 
 //~ JDK IMPORTE ===============================================================
 
@@ -67,26 +68,48 @@ import java.util.TimerTask;
 //~ KLASSEN ===================================================================
 
 /**
- * Klasse, die als OSI-2 Protokollmodul für den server-seitigen Teil einer WanCom-Verbindung eingesetzt werden kann. Zur Verwendung dieses Protokollmoduls als
- * Primary ist an dem jeweiligen Anschlußpunkt in der Konfiguration in der Attributgruppe "atg.anschlussPunkt" im Attribut "ProtokollTyp" der Wert
- * "de.bsvrz.kex.tls.osi2osi3.osi2.wancom.Server" einzutragen. Zur Verwendung dieses Protokollmoduls als Secondary ist an dem jeweiligen
- * Anschlußpunkt-Kommunikationspartner in der Konfiguration in der Attributgruppe "atg.anschlussPunktKommunikationsPartner" im Attribut "ProtokollTyp" der Wert
- * "de.bsvrz.kex.tls.osi2osi3.osi2.wancom.Server" einzutragen. Im Parameter "atg.protokollEinstellungenStandard" des Anschlußpunkts werden Defaultswerte für
- * alle Verbindungen an diesem Anschlußpunkt eingestellt. Im Parameter "atg.protokollEinstellungenPrimary" bzw. "atg.protokollEinstellungenSecondary" der dem
- * Anschlußpunkt zugeordneten AnschlußPunktKommunikationsPartner werden individuelle Werte für die Verbindung zum jeweiligen Kommunikationspartner eingestellt.
- * Die Parameterdatensätze können mehrere Einträge enthalten die jeweils aus einem Namen und einem Wert bestehen. Folgende Tabelle enthält die Namen,
- * Defaultwerte und eine Beschreibung der unterstützten Einträge: <table cellpadding="2" cellspacing="2" border="1"> <tr> <th> Name </th> <th> Defaultwert </th>
- * <th> Beschreibung </th> </tr> <tr> <td> wancom.port </td> <td> 7100 </td> <td> Lokale TCP-Portnummer auf der Verbindungen entgegengenommen werden. </td>
- * </tr> <tr> <td> wancom.version </td> <td> 35 </td> <td> Im WanCom-Header übertragene Version des eingesetzten Protokolls. </td> </tr> <tr> <td>
- * wancom.keepAliveTime </td> <td> 20 </td> <td> Zeit in Sekunden zwischen dem Versand von 2 Keep-Alive Telegrammen. </td> </tr> <tr> <td>
- * wancom.keepAliveTimeoutCount </td> <td> 3 </td> <td> Anzahl von in Folge vergangenen keepAliveTime-Intervallen ohne Empfang eines KeepAlive-Telegramms bevor
- * die Verbindung abgebrochen wird. </td> </tr> <tr> <td> wancom.keepAliveType </td> <td> 50 </td> <td> WanCom-Type-Feld in KeepAlive-Telegrammen. </td> </tr>
- * <tr> <td> wancom.tlsType </td> <td> 600 </td> <td> WanCom-Type-Feld in versendeten TLS-Telegrammen. </td> </tr> <tr> <td> wancom.tlsTypeReceive </td> <td>
- * </td> <td> WanCom-Type-Feld in empfangenen TLS-Telegrammen. Dieser Wert muss nur angegeben werden, wenn er sich vom WanCom-Typen zum Versand (wancom.tlsType)
- * unterscheidet. Wenn dieser Wert nicht angegeben wurde, wird der Wert von wancom.tlsType auch zum Empfang verwendet </td> </tr> <tr> <td>
- * wancom.connectRetryDelay </td> <td> 60 </td> <td> Wartezeit in Sekunden, bevor ein fehlgeschlagener Verbindungsversuch wiederholt wird. </td> </tr> <tr> <td>
- * wancom.localAddress </td> <td> </td> <td> Lokale Adresse, die in Wan-Com-Header als Absender eingetragen werden soll. Ein leerer Text, wird automatisch durch
- * die aktuelle lokale Adresse der Wan-Com-Verbindung ersetzt. </td> </tr> </table>
+ * Klasse, die als OSI-2 Protokollmodul für den Server-seitigen Teil einer TLSoIP-Verbindung eingesetzt werden kann.
+ * <p/>
+ * Zur Verwendung dieses Protokollmoduls ist an dem jeweiligen Anschlusspunkt in der Konfiguration in der Attributgruppe
+ * "atg.anschlussPunkt" im Attribut "ProtokollTyp" der Wert "de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip.Server" einzutragen.
+ * <p/>
+ * Im Parameter "atg.protokollEinstellungenStandard" des Anschlußpunkts können die Standardwerte für alle Verbindungen
+ * an diesem Anschlußpunkt eingestellt.
+ * <p/>
+ * Im Parameter "atg.protokollEinstellungenPrimary" der dem Anschlußpunkt zugeordneten
+ * AnschlußPunktKommunikationsPartner können individuelle Werte für die Verbindung zum jeweiligen Kommunikationspartner
+ * eingestellt werden.
+ * <p/>
+ * Die Parameterdatensätze können dabei mehrere Einträge enthalten, die jeweils aus einem Namen und einem Wert
+ * bestehen.
+ * <p/>
+ * Folgende Einträge werden unterstützt (siehe auch TLS 2009, Teil 2, Datenübertragung über TCP/IP (TLSoIP):
+ * <p/>
+ * Verbindungsparameter für beide Verbindungspartner:
+ * <p>
+ * <table cellpadding="2" cellspacing="2" border="1">
+ * <tr> <th> Name </th> <th> Defaultwert </th> <th> Beschreibung </th> </tr>
+ * <tr> <td> tlsoip.C_HelloDelay </td> <td> 30 </td> <td> Zeit [s], nach der ein Keep-Alive-Telegramm an die Gegenstelle versendet werden muss (0=ausgeschaltet für Testzwecke, 1...3599). </td> </tr>
+ * <tr> <td> tlsoip.C_HelloTimeout </td> <td> 60 </td> <td> Zeit [s], nach der spätestens ein Keep-Alive-Telegramm der Gegenstelle erwartet wird ( > C_HelloDelay der Gegenstelle), (0=ausgeschaltet für Testzwecke, 1...3600). </td> </tr>
+ * <tr> <td> tlsoip.C_ReceiptCount </td> <td> 10 </td> <td> Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein Quittungstelegramm versendet werden muss/erwartet wird (1..255). </td> </tr>
+ * <tr> <td> tlsoip.C_ReceiptDelay </td> <td> 15 </td> <td> Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die Gegenstelle versendet werden muss (1..59). </td> </tr>
+ * <tr> <td> tlsoip.C_ReceiptTimeout </td> <td> 30 </td> <td> Zeit [s], nach der spätestens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der Gegenstelle) (1..60). </td> </tr>
+ * <tr> <td> tlsoip.C_SecureConnection </td> <td> nein </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT (immer nein): Verbindung wird ohne SSL betrieben (nein), Verbindung wird mit SSL betrieben (ja). </td> </tr>
+ * </table>
+ * <p/>
+ * <p>
+ * Verbindungsparameter für den Server:
+ * <p>
+ * <table cellpadding="2" cellspacing="2" border="1">
+ * <tr> <th> Name </th> <th> Defaultwert </th> <th> Beschreibung </th> </tr>
+ * <tr> <td> tlsoip.C_AcceptPort </td> <td>  </td> <td> Dynamische und oder Private Ports (49152 bis 65535) gemäß IANA konfigurierbar, auf dem der Server anfragen entgegen nimmt. </td> </tr>
+ * <tr> <td> tlsoip.C_PortMode </td> <td> aktiv </td> <td> AKTUELL WIRD NUR "AKTIV" UNTERSTÜTZT!<br> Portmodus (aktiv/passiv). Passiv nur für Mithörschnittstellen. </td> </tr>
+ * <tr> <td> tlsoip.C_ClientCount </td> <td> 1 </td> <td> AKTUELL WIRD NUR PortMode "AKTIV" mit ClientClount "1" UNTERSTÜTZT!<br> Anzahl der unterstützten Ports (1..255), bei aktiven Ports immer gleich 1. </td> </tr>
+ * <tr> <td> tlsoip.C_ActivePort </td> <td>  </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Bei passiven Ports: Zugeordneter aktiver Port. </td> </tr>
+ * <tr> <td> tlsoip.C_XmitRequest </td> <td> nein </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Bei passiven Ports: Übertragung der Telegramme in Abrufrichtung (ja/nein). </td> </tr>
+ * <tr> <td> tlsoip.C_XmitAnswer </td> <td> nein </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Bei passiven Ports: Übertragung der Telegramme in Antwortrichtung (ja/nein). </td> </tr>
+ * <tr> <td> tlsoip.C_TelTypeList </td> <td>  </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Bei passiven Ports: Liste der erlaubten TelType (OSI-2 TLSoIP). </td> </tr>
+ * </table>
  * <p/>
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
@@ -96,43 +119,51 @@ import java.util.TimerTask;
 public class Server extends TLSoIP implements PropertyQueryInterface {
 
     /** Logger für Debugausgaben */
-    private static final Debug _debug = Debug.getLogger();
+    private static final Debug DEBUG = Debug.getLogger();
 
     //~ FELDER ================================================================
-
-    /** Runnable Objekt, das vom Protokollthread ausgeführt wird und den Protokollablauf steuert */
-    final Server.Worker _worker = new Server.Worker();
-
-    /** Aktueller Zustand des Protokolls */
-    private ProtocolState _protocolState = ProtocolState.CREATED;
-
-    /** Monitor Objekt, das zur Synchronisation des Protokoll-Threads und den API-Zugriffen von fremden Threads auf das Protokoll koordiniert */
-    private final Object _protocolLock = new Object();
-
-    /** Verbindungen zu Kommunikationspartnern, die durch das Protokoll verwaltet werden */
-    private List<Link> _links = new LinkedList<Server.Link>();
 
     /** Thread des Protokolls */
     private final Thread _workThread;
 
+    /** Runnable Objekt, das vom Protokollthread ausgeführt wird und den Protokollablauf steuert */
+    final Server.Worker _worker = new Server.Worker();
+
+    /** Verbindung zum Datenverteiler */
+    ClientDavInterface _connection;
+
+    /** Aktueller Zustand des Protokolls */
+    private ProtocolState _protocolState = ProtocolState.CREATED;
+
+    /** Verbindungen zu Kommunikationspartnern, die durch das Protokoll verwaltet werden */
+    private List<Link> _links = new LinkedList<Server.Link>();
+
+    /**
+     * Monitor Objekt, das zur Synchronisation des Protokoll-Threads und den API-Zugriffen von fremden Threads auf das
+     * Protokoll koordiniert
+     */
+    private final Object _protocolLock = new Object();
+
     //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==============
 
-    /** Default-Konstruktor, mit dem neue WanCom-Server Protokolle instanziiert werden können */
+    /**
+     * Default-Konstruktor, mit dem neue TLSoverIP-Server Protokolle instanziiert werden können.
+     *
+     * @throws IOException wenn eine nicht abgefangene Ausnahme auftritt.
+     */
     public Server() throws IOException {
-        _debug.fine("WanComServer ");
-        _workThread = new Thread(_worker, "wancom.Server.Worker");
+        DEBUG.fine("TLSoIP-Server (Konstruktoraufruf)");
+        _workThread = new Thread(_worker, "TLSoIP.Server.Worker");
     }
 
     //~ METHODEN ==============================================================
 
     /** Bricht die Kommunikation auf allen Verbindungen des Protokolls sofort ab und beendet anschließend das Protokoll. */
     public void abort() {
-        _debug.fine("abort(): " + this);
+        DEBUG.fine(String.format("abort(): %s", this));
 
         synchronized (_protocolLock) {
-            for (Iterator<Server.Link> iterator = _links.iterator(); iterator.hasNext(); ) {
-                Server.Link link = iterator.next();
-
+            for (Link link : _links) {
                 link.abort();
             }
 
@@ -164,7 +195,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
     /**
      * Bestimmt, ob die Kommunikation dieses Protokolls bereits mit der Methode {@link #start} aktiviert wurde.
      *
-     * @return <code>true</code>, wenn die Kommunikation dieses Protokolls bereits aktiviert wurde, sonst <code>false</code>.
+     * @return <code>true</code>, wenn die Kommunikation dieses Protokolls bereits aktiviert wurde, sonst
+     *         <code>false</code>.
      */
     public boolean isStarted() {
         synchronized (_protocolLock) {
@@ -175,16 +207,15 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
     //~ SET METHODEN ==========================================================
 
     /**
-     * Nimmmt die Verbindung zum Datenverteiler entgegen. Diese Methode wird vom OSI-3 Modul nach dem Erzeugen des OSI-2 Moduls durch den jeweiligen Konstruktor
-     * aufgerufen. Eine Implementierung eines Protokollmoduls kann sich bei Bedarf die übergebene Datenverteilerverbindung intern merken, um zu späteren
-     * Zeitpunkten auf die Datenverteiler-Applikationsfunktionen zuzugreifen.
+     * Nimmmt die Verbindung zum Datenverteiler entgegen. Diese Methode wird vom OSI-3 Modul nach dem Erzeugen des OSI-2
+     * Moduls durch den jeweiligen Konstruktor aufgerufen. Eine Implementierung eines Protokollmoduls kann sich bei
+     * Bedarf die übergebene Datenverteilerverbindung intern merken, um zu späteren Zeitpunkten auf die
+     * Datenverteiler-Applikationsfunktionen zuzugreifen.
      *
      * @param connection Verbindung zum Datenverteiler
      */
     public void setDavConnection(ClientDavInterface connection) {
-
-        // _connection = connection;
-        return;
+        _connection = connection;
     }
 
     /**
@@ -194,12 +225,10 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
      */
     public void setProperties(Properties properties) {
         super.setProperties(properties);
-        _debug.fine("Neue Einstellungen für: " + toString() + ", properties = " + properties);
+        DEBUG.fine(String.format("Neue Einstellungen für: %s, properties = %s", toString(), properties));
 
         synchronized (_protocolLock) {
-            for (Iterator<Server.Link> iterator = _links.iterator(); iterator.hasNext(); ) {
-                Server.Link link = iterator.next();
-
+            for (Link link : _links) {
                 link.reload();
             }
         }
@@ -209,12 +238,10 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
     /** Terminiert alle Verbindungen des Protokolls und beendet anschließend das Protokoll. */
     public void shutdown() {
-        _debug.fine("shutdown): " + this);
+        DEBUG.fine(String.format("shutdown): %s", this));
 
         synchronized (_protocolLock) {
-            for (Iterator<Server.Link> iterator = _links.iterator(); iterator.hasNext(); ) {
-                Server.Link link = iterator.next();
-
+            for (Link link : _links) {
                 link.shutdown();
             }
 
@@ -232,7 +259,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
     /** Initialisiert das Protokoll und startet den Protokoll-Thread */
     public void start() {
-        _debug.fine("start(): " + this);
+        DEBUG.fine(String.format("start(): %s", this));
 
         synchronized (_protocolLock) {
             if (_protocolState != ProtocolState.CREATED) {
@@ -242,19 +269,24 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             int localAddress = getLocalAddress();
 
             if ((localAddress < 1) || (localAddress > 254)) {
-                throw new IllegalStateException("lokale OSI-2 Adresse muss zwischen 1 und 254 liegen, ist: " + localAddress);
+                throw new IllegalStateException(String.format("lokale OSI-2 Adresse muss zwischen 1 und 254 liegen, ist: %d", localAddress));
             }
 
-            _workThread.setName("wancom.Server.Worker(" + localAddress + ")");
+            _workThread.setName(String.format("TLSoIP.Server.Worker(%d)", localAddress));
             _workThread.start();
             _protocolState = ProtocolState.STARTING;
             _protocolLock.notifyAll();
         }
     }
 
-    /** @return Gibt Informationen des Protokolls für Debugzwecke zurück */
+    /**
+     * Gibt Informationen des Protokolls für Debugzwecke zurück. Das genaue Format ist nicht festgelegt und kann sich
+     * ändern..
+     *
+     * @return Gibt Informationen des Protokolls für Debugzwecke zurück
+     */
     public String toString() {
-        return "WAN-Com-Server(" + getLocalAddress() + ", " + _protocolState + ") ";
+        return String.format("TLSoIP-Server(%d, %s) ", getLocalAddress(), _protocolState);
     }
 
     //~ INNERE KLASSEN ========================================================
@@ -274,11 +306,23 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         /** Signalisiert dem Protokoll-Thread, das ein erneuter Verbindungsversuch durchgeführt werden soll */
         public static final Server.ActionType RETRY_CONNECT = new Server.ActionType("RETRY_CONNECT");
 
-        /** Signalisiert dem Protokoll-Thread, das die Kommunikation auf einer Verbindung mit Berücksichtigung von evtl. Parameteränderungen neu aufgebaut werden soll */
+        /**
+         * Signalisiert dem Protokoll-Thread, das die Kommunikation auf einer Verbindung mit Berücksichtigung von evtl.
+         * Parameteränderungen neu aufgebaut werden soll
+         */
         public static final Server.ActionType RELOAD_CALLED = new Server.ActionType("RELOAD_CALLED");
 
-        /** Signalisiert dem Protokoll-Thread, das ein Keep-Alive-Telegramm gesendet werden soll und das der Empfang von Keep-Alive-Telegrammen geprüft werden soll */
-        public static final Server.ActionType KEEPALIVE_TIMER = new Server.ActionType("KEEPALIVE_TIMER");
+        /** Signalisiert dem Protokoll-Thread, das ein Quittierungs-Telegramm gesendet werden soll */
+        public static final Server.ActionType QUITT_TIMER_SEND = new Server.ActionType("QUITT_TIMER_SEND");
+
+        /** Signalisiert dem Protokoll-Thread, das ein der Empfang eines Quittierungs-Telegramms geprüft werden soll */
+        public static final Server.ActionType QUITT_TIMER_RECEIVE = new Server.ActionType("QUITT_TIMER_RECEIVE");
+
+        /** Signalisiert dem Protokoll-Thread, das ein Keep-Alive-Telegramm gesendet werden soll */
+        public static final Server.ActionType KEEPALIVE_TIMER_SEND = new Server.ActionType("KEEPALIVE_TIMER_SEND");
+
+        /** Signalisiert dem Protokoll-Thread, das ein der Empfang von Keep-Alive-Telegrammen geprüft werden soll */
+        public static final Server.ActionType KEEPALIVE_TIMER_RECEIVE = new Server.ActionType("KEEPALIVE_TIMER_RECEIVE");
 
         /** Signalisiert dem Protokoll-Thread, das die Kommunikation auf einer Verbindung abgebrochen werden soll */
         public static final Server.ActionType ABORT_CALLED = new Server.ActionType("ABORT_CALLED");
@@ -301,17 +345,21 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
         //~ METHODEN ==========================================================
 
-        /** @return Name der Aktion für Debugzwecke */
+        /**
+         * Gibt Informationen des ActionType für Debugzwecke zurück. Das genaue Format ist nicht festgelegt und kann
+         * sich ändern..
+         *
+         * @return Name der Aktion für Debugzwecke
+         */
         public String toString() {
             return _name;
         }
     }
 
 
-    /** Signalisiert Fehler in empfangenen Telegrammen */
+    /** Signalisiert fehlerhafte Zustände in empfangenen Telegrammen */
     private static class IllegalTelegramException extends Exception {
-
-        /**
+	    /**
          * Erzeugt eine neue Ausnahme mit einer spezifischen Fehlerbeschreibung
          *
          * @param message Spezifische Fehlerbeschreibung der Ausnahme
@@ -325,14 +373,95 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
     /** Realisiert ein Verbindungsobjekt, das die Kommunikation mit einem einzelnen Kommunikationspartner verwaltet. */
     private class Link extends AbstractDataLinkLayer.Link implements DataLinkLayer.Link, PropertyQueryInterface {
 
+        /** Wrapper-Objekt zum bequemen Zugriff auf die online änderbaren Parameter dieser Verbindung */
+        private final PropertyConsultant _propertyConsultant;
+
+        /** Priorisierte Queue mit den noch zu versendenden Telegrammen */
+        private final PriorityChannel _sendChannel;
+
+        /** Anzahl der empfangenen Daten-Telegramme seit des letzten Quittungstelegramm-Versands */
+        private int _countReceiptDataTel;
+
+        /** Anzahl des gesendeten Daten-Telegramme seit des letzten Quittungstelegramm-Empfangs */
+        private int _countSendDataTel;
+
+        /** Sequenznummer des letzten empfangenen Daten-Telegramms */
+        private int _lastReceiptSeqNumDataTel;
+
+        /** Zeitpunkt des letzten empfangenen Telegramms (Keep-Alive, Quittung oder Daten) in Millisekunden */
+        private long _lastReceiptTimeAllTel;
+
+        /** Zeitpunkt des letzten empfangenen Daten-Telegramms in Millisekunden */
+        private long _lastReceiptTimeDataTel;
+
+        /** Sequenznummer des letzten gesendeten Daten-Telegramms */
+        private int _lastSendSeqNumDataTel;
+
+        /** Zeitpunkt des letzten gesendeten Telegramms (Keep-Alive, Quittung oder Daten) in Millisekunden */
+        private long _lastSendTimeAllTel;
+
+        /** Zeitpunkt des letzten gesendeten Daten-Telegramms in Millisekunden */
+        private long _lastSendTimeDataTel;
+
+        /** Flag das signalisiert, dass ein Keep-Alive-Telegramm versendet werden soll */
+        private boolean _sendKeepAliveTel;
+
+        /** Flag das signalisiert, dass ein Quittungs-Telegramm versendet werden soll */
+        private boolean _sendQuittTel;
+
+        /**
+         * Enthält während des Verbindungsaufbau das Kommunikationsobjekt mit internem Serversocket, über den die
+         * Verbindung des Clients entgegengenommen wird; sonst <code>null</code>.
+         */
+        private ServerSocketChannel _serverSocketChannel;
+
+        /**
+         * Enthält während einer bestehenden Verbindung das Kommunikationsobjekt mit internem Server, über den der
+         * Datenaustausch mit dem Client abgewickelt wird; sonst <code>null</code>.
+         */
+        private SocketChannel _socketChannel;
+
+        /**
+         * Serverport, auf dem Anfragen entgegengenommen werden. Dynamische und oder Private Ports (49152 bis 65535)
+         * gemäß IANA konfigurierbar
+         */
+        private int _tlsoipCAcceptPort;
+
+        /**
+         * Zeit [s], nach der ein Keep-Alive-Telegramm an die Gegenstelle versendet werden muss (0=ausgeschaltet für
+         * Testzwecke, 1...3599)
+         */
+        private int _tlsoipCHelloDelay;
+
+        /**
+         * Zeit [s], nach der spätestens ein Keep-Alive-Telegramm der Gegenstelle erwartet wird ( > C_HelloDelay der
+         * Gegenstelle), (0=ausgeschaltet für Testzwecke, 1...3600)
+         */
+        private int _tlsoipCHelloTimeout;
+
+        /**
+         * Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein Quittungstelegramm versendet werden
+         * muss/erwartet wird (1..255)
+         */
+        private int _tlsoipCReceiptCount;
+
+        /**
+         * Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die Gegenstelle
+         * versendet werden muss (1..59)
+         */
+        private int _tlsoipCReceiptDelay;
+
+        /**
+         * Zeit [s], nach der spätestens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der
+         * Gegenstelle) (1..60)
+         */
+        private int _tlsoipCReceiptTimeout;
+
         /** Aktuell asynchron zu sendendes Telegramm */
         byte[] _packetOnTheAir = null;
 
         /** Enthält die online änderbaren Parameter für diese Verbindung */
         private Properties _properties = null;
-
-        /** Wartezeit in Sekunden, die nach einem fehlerbedingten Verbindungsabbruch gewartet wird, bevor die Verbindung neu aufgebaut wird. */
-        private int _tlsoipCReconnectDelay = 60;
 
         /** Timerobjekt mit dem zukünftige Aktionen geplant und ausgeführt werden */
         private final Timer _timer = new Timer(true);
@@ -341,55 +470,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         private final ByteBuffer _sendBuffer = ByteBuffer.allocateDirect(28 + getMaximumDataSize());
 
         /** Empfangspuffer für empfangene Telegramme */
-        private final ByteBuffer _readBuffer = ByteBuffer.allocateDirect(2204);
-
-        /** Lokale IP-Adresse, die in versendeten Telegrammen eingetragen wird. */
-        private byte[] _wanComIp8 = new byte[8];
-
-        /** Anzahl Intervall, in denen aktuell in Folge kein Keep-Alive-Telegramm empfangen wurde. */
-        private int _keepAliveReceiveTimeoutCount;
-
-        /** Zeitpunkt des letzten empfangenen Keep-Alive-Telegramms in Millisekunden */
-        private long _lastKeepAliveReceive;
-
-        /** Wrapper-Objekt zum bequemen Zugriff auf die online änderbaren Parameter dieser Verbindung */
-        private final PropertyConsultant _propertyConsultant;
-
-        /** Priorisierte Queue mit den noch zu versendenden Telegrammen */
-        private final PriorityChannel _sendChannel;
-
-        /** Flag das signalisiert, dass ein Keep-Alive-Telegramm versendet werden soll */
-        private boolean _sendKeepAlive;
-
-        /**
-         * Enthält während des Verbindungsaufbau das Kommunikationsobjekt mit internem Serversocket, über den die Verbindung des Clients entgegengenommen wird; sonst
-         * <code>null</code>.
-         */
-        private ServerSocketChannel _serverSocketChannel;
-
-        /**
-         * Enthält während einer bestehenden Verbindung das Kommunikationsobjekt mit internem Server, über den der Datenaustausch mit dem Client abgewickelt wird;
-         * sonst <code>null</code>.
-         */
-        private SocketChannel _socketChannel;
-
-        /** Intervallzeit in Sekunden für den Versand und Empfang von Keep-Alive-Telegrammen */
-        private int _wanComKeepAliveTimeSeconds;
-
-        /** Anzahl Intervalle ohne Empfang eines Keep-Alive-Telegramms nach der eine bestehende Verbindung abgebrochen und neu aufgebaut wird. */
-        private int _wanComKeepAliveTimeoutCount;
-
-        /** WanCom-Typfeld ind Keep-Alive-Telegrammen */
-        private int _wanComKeepAliveType;
-
-        /** WanCom-Typ für versendete TLS-Telegramme */
-        private int _wanComTlsType;
-
-        /** WanCom-Typ für empfangene TLS-Telegramme */
-        private int _wanComTlsTypeReceive;
-
-        /** Versionsfeld der WanCom-Telegramme */
-        private int _wanComVersion;
+        private final ByteBuffer _readBuffer = ByteBuffer.allocateDirect(3000);
 
         //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==========
 
@@ -403,20 +484,18 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             _propertyConsultant = new PropertyConsultant(this);
 
             if ((remoteAddress < 1) || (remoteAddress > 255)) {
-                throw new IllegalArgumentException("OSI-2 Adresse muss zwischen 1 und 254 liegen oder den speziellen Wert 255 (Broadcastaddresse) haben, versorgt ist: " + remoteAddress);
+                throw new IllegalArgumentException(String.format("OSI-2 Adresse muss zwischen 1 und 254 liegen oder den speziellen Wert 255 (Broadcastaddresse) haben, versorgt ist: %d", remoteAddress));
             }
 
-            _sendChannel = new PriorityChannel(3, 2000);
+            _sendChannel = new PriorityChannel(3, 1000);
             _readBuffer.order(ByteOrder.LITTLE_ENDIAN);
             _sendBuffer.order(ByteOrder.LITTLE_ENDIAN);
             _linkState = LinkState.DISCONNECTED;
 
             synchronized (_protocolLock) {
-                for (Iterator<Server.Link> iterator = _links.iterator(); iterator.hasNext(); ) {
-                    Server.Link link = iterator.next();
-
+                for (Link link : _links) {
                     if (link.getRemoteAddress() == _remoteAddress) {
-                        throw new IllegalStateException("Es gibt bereits ein Verbindung mit dieser Secondary-Adresse: " + _remoteAddress);
+                        throw new IllegalStateException(String.format("Es gibt bereits ein Verbindung mit dieser Secondary-Adresse: %d", _remoteAddress));
                     }
                 }
 
@@ -428,7 +507,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
         /** Initiiert den sofortigen Abbruch der bestehenden Verbindung dieses Verbindungsobjekts */
         public void abort() {
-            _debug.fine("abort " + this);
+            DEBUG.fine(String.format("abort %s", this));
 
             synchronized (_linkLock) {
                 if ((_linkState == LinkState.DISCONNECTED) || (_linkState == LinkState.DISCONNECTING)) {
@@ -450,41 +529,45 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             notifyWorker(Server.ActionType.ABORT_CALLED);
         }
 
-        /**
-         * Schließt den Kommunikationskanal zum Client und plant den erneuten Aufbau der Kommunikationsverbindung nach der durch den Parameter
-         * "wancom.connectRetryDelay" vorgebbaren Wartezeit ein.
-         */
+        /** Schließt den Kommunikationskanal zum Client und wartet auf neuen Verbindungsaufbau seitens des Client. */
         private void closeChannel() {
-            closeChannel(_tlsoipCReconnectDelay);
+            closeChannel(0);  // Verbindung sofort wieder akzeptieren
         }
 
         /**
-         * Schließt den Kommunikationskanal zum Client und plant den erneuten Aufbau der Kommunikationsverbindung nach einer vorgebbaren Wartezeit ein.
+         * Schließt den Kommunikationskanal zum Client und plant den erneuten Aufbau der Kommunikationsverbindung nach
+         * einer vorgebbaren Wartezeit ein.
          *
          * @param reconnectDelay Wartezeit nach der die Verbindung wieder aufgebaut werden soll.
          */
         private void closeChannel(int reconnectDelay) {
             synchronized (_linkLock) {
+
+                // DIFFCLIENT ANFANG
                 if (_serverSocketChannel != null) {
                     try {
                         _serverSocketChannel.close();
                     }
                     catch (IOException e) {
-                        _debug.warning("Fehler beim Schließen des ServerSocketChannels: " + e);
+                        DEBUG.warning("Fehler beim Schließen des ServerSocketChannels: " + e);
                     }
                     finally {
-                        _serverSocketChannel = null;
+	                    //noinspection AssignmentToNull
+	                    _serverSocketChannel = null;
                     }
                 }
 
+                // DIFFCLIENT ENDE
                 if (_socketChannel != null) {
                     try {
                         _socketChannel.close();
                     }
                     catch (IOException e) {
-                        _debug.warning("Fehler beim Schließen des SocketChannels: " + e);
+                        DEBUG.warning(String.format("Fehler beim Schließen des SocketChannels: %s", e));
                     }
                     finally {
+
+                        // noinspection AssignmentToNull
                         _socketChannel = null;
                     }
                 }
@@ -494,14 +577,14 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                     notifyEvent(DataLinkLayerEvent.Type.DISCONNECTED, null);
                 } else if (_linkState == LinkState.CONNECTED) {
                     _linkState = LinkState.CONNECTING;
-                    _debug.fine("Nächster Verbundungsversuch in " + reconnectDelay + " Sekunden; " + this);
+                    DEBUG.fine(String.format("Nächster Verbundungsversuch in %d Sekunden möglich; %s", reconnectDelay, this));
                     scheduleActionTimer(Server.ActionType.RETRY_CONNECT, reconnectDelay);
                     notifyEvent(DataLinkLayerEvent.Type.DISCONNECTED, null);
                 } else if (_linkState == LinkState.CONNECTING) {
-                    _debug.fine("Nächster Verbundungsversuch in " + reconnectDelay + " Sekunden; " + this);
+                    DEBUG.fine(String.format("Nächster Verbundungsversuch in %d Sekunden möglich; %s", reconnectDelay, this));
                     scheduleActionTimer(Server.ActionType.RETRY_CONNECT, reconnectDelay);
                 } else {
-                    _debug.error("closeChannel: Unmöglicher Zustand: Fehler ohne bestehende Verbindung; " + this);
+                    DEBUG.error(String.format("closeChannel: Unmöglicher Zustand: Fehler ohne bestehende Verbindung; %s", this));
                     _linkState = LinkState.DISCONNECTED;
                 }
             }
@@ -509,7 +592,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
         /** Initiiert den Verbindungsaufbau mit dem Kommunikationspartner dieses Verbindungsobjekts */
         public void connect() {
-            _debug.fine("connect " + this);
+            DEBUG.fine(String.format("connect %s", this));
 
             synchronized (_protocolLock) {
                 synchronized (_linkLock) {
@@ -518,7 +601,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                     }
 
                     if (_linkState != LinkState.DISCONNECTED) {
-                        throw new IllegalStateException("Verbindung kann in diesem Zustand nicht aufgebaut werden: " + _linkState);
+                        throw new IllegalStateException(String.format("Verbindung kann in diesem Zustand nicht aufgebaut werden: %s", _linkState));
                     }
 
                     _linkState = LinkState.CONNECTING;
@@ -531,9 +614,10 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         }
 
         /**
-         * Asynchroner Verbindungsaufbau. Zum Aufbau der Kommunikationsverbindung wird ein Kommunikationskanal mit einem Serversocket initialisiert, der auf dem
-         * gewünschten TCP-Port Verbindungen entgegennimmt. Nachdem Verbindungsaufbau wird der Serversocket wieder geschlossen und ein neuer Kommunikationskanal für
-         * den Datenaustausch initialisiert.
+         * Asynchroner Verbindungsaufbau. Zum Aufbau der Kommunikationsverbindung wird ein Kommunikationskanal mit einem
+         * Serversocket initialisiert, der auf dem gewünschten TCP-Port Verbindungen entgegennimmt. Nachdem
+         * Verbindungsaufbau wird der Serversocket wieder geschlossen und ein neuer Kommunikationskanal für den
+         * Datenaustausch initialisiert.
          *
          * @param selector Selektor des Protokoll-Threads zum asynchronen Zugriff auf die Kommunikationskanäle.
          */
@@ -542,32 +626,23 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                 if (_linkState == LinkState.CONNECTING) {
                     try {
                         if (_serverSocketChannel == null) {
-                            _keepAliveReceiveTimeoutCount = 0;
                             _readBuffer.clear();
                             _sendBuffer.clear().flip();
-                            _packetOnTheAir              = null;
-                            _sendKeepAlive               = false;
-                            _wanComVersion               = _propertyConsultant.getIntProperty("wancom.version");
-                            _wanComKeepAliveTimeSeconds  = _propertyConsultant.getIntProperty("wancom.keepAliveTime");
-                            _wanComKeepAliveTimeoutCount = _propertyConsultant.getIntProperty("wancom.keepAliveTimeoutCount");
-                            _wanComKeepAliveType         = _propertyConsultant.getIntProperty("wancom.keepAliveType");
-                            _wanComTlsType               = _propertyConsultant.getIntProperty("wancom.tlsType");
 
-                            try {
-                                _wanComTlsTypeReceive = _propertyConsultant.getIntProperty("wancom.tlsTypeReceive");
-                            }
-                            catch (Exception e) {
-                                _wanComTlsTypeReceive = _wanComTlsType;
-                            }
+                            // noinspection AssignmentToNull
+                            _packetOnTheAir = null;
 
-                            _tlsoipCReconnectDelay = _propertyConsultant.getIntProperty("tlsoip.C_ReconnectDelay");
-                            _serverSocketChannel   = ServerSocketChannel.open();
+                            // Verbindungs- und Kommunikationsparameter einlesen
+                            _tlsoipCAcceptPort           = _propertyConsultant.getIntProperty("tlsoip.C_AcceptPort");
+                            _tlsoipCHelloDelay           = _propertyConsultant.getIntProperty("tlsoip.C_HelloDelay");
+                            _tlsoipCHelloTimeout         = _propertyConsultant.getIntProperty("tlsoip.C_HelloTimeout");
+                            _tlsoipCReceiptCount         = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptCount");
+                            _tlsoipCReceiptDelay         = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptDelay");
+                            _tlsoipCReceiptTimeout       = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptTimeout");
+                            _serverSocketChannel         = ServerSocketChannel.open();
                             _serverSocketChannel.configureBlocking(false);
-
-                            final int localPort = _propertyConsultant.getIntProperty("wancom.port");
-
-                            _serverSocketChannel.socket().bind(new InetSocketAddress(localPort));
-                            _debug.info("Akzeptiere Verbindungen auf Port " + localPort + "; " + this);
+                            _serverSocketChannel.socket().bind(new InetSocketAddress(_tlsoipCAcceptPort));
+                            DEBUG.info(String.format("Server aktzeptiert Verbindung auf Port %d; %s", _tlsoipCAcceptPort, this));
                         }
 
                         if (_serverSocketChannel != null) {
@@ -578,31 +653,35 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
                                 _socketChannel.configureBlocking(false);
                                 _serverSocketChannel.close();
-                                _serverSocketChannel = null;
 
-                                byte[]       ip           = _socketChannel.socket().getLocalAddress().getAddress();
-                                final String localAddress = _propertyConsultant.getProperty("wancom.localAddress");
+                                // noinspection AssignmentToNull
+                                _serverSocketChannel      = null;
+                                _linkState                = LinkState.CONNECTED;
+                                _lastReceiptTimeAllTel    = System.currentTimeMillis();
+                                _lastSendTimeAllTel       = System.currentTimeMillis();
+                                _lastReceiptTimeDataTel   = System.currentTimeMillis();
+                                _lastReceiptTimeAllTel    = System.currentTimeMillis();
+                                _lastReceiptSeqNumDataTel = 0xffff;  // Als nächstes wird die 0 erwartet
+                                _lastSendSeqNumDataTel    = 0xffff;  // Als nächstes wird die 0 erwartet
+                                _countReceiptDataTel      = 0;
+                                _countSendDataTel         = 0;
+                                _sendKeepAliveTel         = true;
+                                _sendQuittTel             = false;
+                                DEBUG.info("Verbindungsaufbau von " + socket.getInetAddress().getHostName() + " akzeptiert; " + this);
 
-                                if ((localAddress != null) &&!localAddress.equals("")) {
-                                    ip = InetAddress.getByName(localAddress).getAddress();
-                                }
-
-                                System.arraycopy(ip, 0, _wanComIp8, 0, Math.min(ip.length, _wanComIp8.length));
-                                _lastKeepAliveReceive = System.currentTimeMillis();
-                                _linkState            = LinkState.CONNECTED;
-                                _debug.info("Verbindungsaufbau von " + socket.getInetAddress().getHostName() + " akzeptiert; " + this);
+                                // Kanal zum Lesen registrieren
                                 _socketChannel.register(selector, SelectionKey.OP_READ, this);
                                 notifyEvent(DataLinkLayerEvent.Type.CONNECTED, null);
-                                _sendKeepAlive = true;
-                                scheduleActionTimer(Server.ActionType.KEEPALIVE_TIMER, _wanComKeepAliveTimeSeconds);
+                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE, _tlsoipCHelloTimeout);
+                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_SEND, _tlsoipCHelloDelay);
                             } else {
-                                _debug.info("Verbindungsaufbau ist noch nicht abgeschlossen und wird asynchron durchgeführt; " + this);
+                                DEBUG.info(String.format("Verbindungsaufbau ist noch nicht abgeschlossen und wird asynchron durchgeführt; %s", this));
                                 _serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT, this);
                             }
                         }
                     }
                     catch (Exception e) {
-                        _debug.warning("Verbindungsversuch hat nicht funktioniert; " + this, e);
+                        DEBUG.warning(String.format("Verbindungsaufbau ist fehlgeschlagen: %s.", this), e);
                         closeChannel();
                     }
                 }
@@ -614,6 +693,21 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         /** @return Das zu dieser Verbindung gehörende Protokollmodul */
         public DataLinkLayer getDataLinkLayer() {
             return Server.this;
+        }
+
+        /**
+         * Ermittelt auf Basis der aktullen SeqNum des Daten-Telegramm die nächste folgende Nummer.
+         *
+         * @param num Aktuelle SeqNum des Daten Telegramms
+         *
+         * @return Nächste Nummer (num = num+1), wobei bei num = 65535 die nächste Nummer 0 ist.
+         */
+        public int getNextSeqNum(int num) {
+            if (num == 65535) {
+                return 0;
+            } else {
+                return num + 1;
+            }
         }
 
         /**
@@ -634,37 +728,18 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         //~ METHODEN ==========================================================
 
         /**
-         * Führt eine Aktion für dieses Verbindungsobjekt aus. Diese Methode wird vom Protokoll-Thread zur Verarbeitung einer Aktion aufgerufen.
+         * Führt eine Aktion für dieses Verbindungsobjekt aus. Diese Methode wird vom Protokoll-Thread zur Verarbeitung
+         * einer Aktion aufgerufen.
          *
          * @param action   Auszuführende Aktion
          * @param selector Selektor des Protokoll-Threads zum asynchronen Zugriff auf die Kommunikationskanäle.
          */
         public void handleAction(Server.ActionType action, Selector selector) {
-            _debug.finer("handleAction(" + action + "): " + this);
+            DEBUG.finer(String.format("handleAction(%s): %s", action, this));
 
             if ((action == Server.ActionType.CONNECT_CALLED) || (action == Server.ActionType.RETRY_CONNECT)) {
-                _debug.fine("Verbindung aufbauen");
+                DEBUG.fine("Verbindung aufbauen");
                 connectSocketChannel(selector);
-            } else if (action == Server.ActionType.KEEPALIVE_TIMER) {
-                synchronized (_linkLock) {
-                    if (_linkState == LinkState.CONNECTED) {
-                        _sendKeepAlive = true;
-
-                        if (_lastKeepAliveReceive + _wanComKeepAliveTimeSeconds * 1000L < System.currentTimeMillis()) {
-                            ++_keepAliveReceiveTimeoutCount;
-                            _debug.info("KeepAlive Timeout, Zähler: " + _keepAliveReceiveTimeoutCount + "; " + this);
-
-                            if (_keepAliveReceiveTimeoutCount >= _wanComKeepAliveTimeoutCount) {
-                                _debug.warning("Verbindung wird neu initialisiert wegen fehlenden KeepAlive Telegrammen: " + this);
-                                closeChannel();
-
-                                return;
-                            }
-                        }
-
-                        scheduleActionTimer(Server.ActionType.KEEPALIVE_TIMER, _wanComKeepAliveTimeSeconds);
-                    }
-                }
             } else if (action == Server.ActionType.SEND_CALLED) {
 
                 // handleAsyncSend() wird auf jeden Fall aufgerufen (s.u.)
@@ -676,10 +751,121 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             } else if (action == Server.ActionType.SHUTDOWN_CALLED) {
 
                 // nichts zu tun
+            } else if (action == Server.ActionType.KEEPALIVE_TIMER_RECEIVE) {
+                synchronized (_linkLock) {
+                    if (_linkState == LinkState.CONNECTED) {
+
+                        // Prüfen, ob KeepAlive-Überwachung für den Empfang nicht ausgeschaltet ist (zu Testzwecken)
+                        if (_tlsoipCHelloTimeout == 0) {
+                            DEBUG.info("KeepAlive-Überwachung für den Empfang ist ausgeschaltet (tlsoip.C_HelloTimeout = 0)");
+                        } else {
+
+                            // Zeitraum [s], seit letztes Telegramm empfangen wurde
+                            int durationSinceLastReceiptAllTel = (int) ((System.currentTimeMillis() - _lastReceiptTimeAllTel) / 1000L);
+
+                            // Hätte KeepAlive-Telegramm bereits empfangen werden müssen?
+                            if (_tlsoipCHelloTimeout < durationSinceLastReceiptAllTel) {
+
+                                // Ja. Verbindung abbrechen und nach Wartezeit neu aufbauen.
+                                DEBUG.warning(String.format("Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes KeepAlive vor %ds > Parameter tlsoip.C_HelloTimeout %d", durationSinceLastReceiptAllTel, _tlsoipCHelloTimeout));
+                                closeChannel();
+                            } else {
+
+                                // Nein, aber bald. Timer neu setzen
+                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE, _tlsoipCHelloTimeout - durationSinceLastReceiptAllTel);
+                            }
+                        }
+                    }
+
+                    return;
+                }
+            } else if (action == Server.ActionType.KEEPALIVE_TIMER_SEND) {
+                synchronized (_linkLock) {
+                    if (_linkState == LinkState.CONNECTED) {
+
+                        // Prüfen, ob KeepAlive-Überwachung für das Senden nicht ausgeschaltet ist (zu Testzwecken)
+                        if (_tlsoipCHelloDelay == 0) {
+                            DEBUG.info("KeepAlive-Überwachung für das Senden ist ausgeschaltet (tlsoip.C_HelloDelay = 0)");
+                            _sendKeepAliveTel = false;
+                        } else {
+
+                            // Zeitraum [s], seit letztes Telegramm gesendet wurde
+                            int durationSinceLastSendAllTel = (int) ((System.currentTimeMillis() - _lastSendTimeAllTel) / 1000L);
+
+                            // Muss KeepAlive-Telegramm versendet werden ?
+                            if (_tlsoipCHelloDelay < durationSinceLastSendAllTel) {
+
+                                // Ja (erfolgt in handleAsyncSend()). Zusätzlich Timer für nächsten spätesten Versand setzten.
+                                _sendKeepAliveTel = true;
+                                scheduleActionTimer(Server.ActionType.KEEPALIVE_TIMER_SEND, _tlsoipCHelloDelay);
+                            } else {
+
+                                // Nein, aber bald. Timer neu setzen.
+                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE, _tlsoipCHelloDelay - durationSinceLastSendAllTel);
+                            }
+                        }
+                    }
+                }
+            } else if (action == Server.ActionType.QUITT_TIMER_RECEIVE) {
+                synchronized (_linkLock) {
+                    if (_linkState == LinkState.CONNECTED) {
+
+                        // Prüfen, ob Quittierungs-Überwachung für den Empfang nicht ausgeschaltet ist (zu Testzwecken)
+                        if (_tlsoipCReceiptTimeout == 0) {
+                            DEBUG.info("Quittierungs-Überwachung für versandte Daten-Telegramme ist ausgeschaltet (tlsoip.C_ReceiptTimeout = 0)");
+                        } else {
+
+                            // Zeitraum [s], seit letztes Daten-Telegramm verschickt wurde
+                            int durationSinceLastSendDataTel = (int) ((System.currentTimeMillis() - _lastSendTimeDataTel) / 1000L);
+
+                            // Hätte Quittierungs-Telegramm bereits empfangen werden müssen?
+                            if (_tlsoipCReceiptTimeout < durationSinceLastSendDataTel) {
+
+                                // Ja. Verbindung abbrechen und nach Wartezeit neu aufbauen.
+                                DEBUG.warning(String.format("Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes Quittungs-Telegramm vor %ds > Parameter tlsoip.C_ReceiptTimeout %d", durationSinceLastSendDataTel, _tlsoipCReceiptTimeout));
+                                closeChannel();
+                            } else {
+
+                                // Nein, aber bald. Timer neu setzen
+                                scheduleActionTimer(ActionType.QUITT_TIMER_RECEIVE, _tlsoipCReceiptTimeout - durationSinceLastSendDataTel);
+                            }
+                        }
+                    }
+
+                    return;
+                }
+            } else if (action == Server.ActionType.QUITT_TIMER_SEND) {
+                synchronized (_linkLock) {
+                    if (_linkState == LinkState.CONNECTED) {
+
+                        // Prüfen, ob Quittungs-Überwachung für das Senden nicht ausgeschaltet ist (zu Testzwecken)
+                        if (_tlsoipCReceiptDelay == 0) {
+                            DEBUG.info("Quittierungs-Überwachung für empfangene Daten-Telegramme ist ausgeschaltet (tlsoip.C_ReceiptDelay = 0)");
+                            _sendQuittTel = false;
+                        } else {
+
+                            // Zeitraum [s], seit letztes Daten-Telegramm empfangen wurde
+                            int durationSinceLastReceiptDataTel = (int) ((System.currentTimeMillis() - _lastReceiptTimeDataTel) / 1000L);
+
+                            // Muss Quittierungs-Telegramm versendet werden ?
+                            if ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount)) {
+
+                                // Ja (erfolgt in handleAsyncSend()). Zusätzlich Timer für nächsten spätesten Versand setzten.
+                                _sendQuittTel = true;
+                                scheduleActionTimer(Server.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay);
+                            } else {
+
+                                // Nein, aber bald. Timer neu setzen.
+                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
+                            }
+                        }
+                    }
+                }
             } else {
-                _debug.error("unbekannter ActionType: " + action);
+                DEBUG.warning(String.format("Unbekannter ActionType: %s", action));
             }
 
+            // In jedem Fall werden eventuell anliegende Sendeaufträge (KeepAlive, Quittungen, Daten) bearbeitet
             handleAsyncSend(selector);
         }
 
@@ -696,75 +882,82 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             try {
                 do {
                     if (!_sendBuffer.hasRemaining()) {
-                        if (_sendKeepAlive) {
-                            _debug.finer("Senden eines KeepAlive-Telegramms");
-                            _debug.finest("eingetragene lokale IP: " + _wanComIp8[0] + "." + _wanComIp8[1] + "." + _wanComIp8[2] + "." + _wanComIp8[3] + "." + _wanComIp8[4] + "." + _wanComIp8[5] + "." + _wanComIp8[6] + "." + _wanComIp8[7]);
-                            _sendKeepAlive = false;
+                        if (_sendQuittTel) {
+
+                            // Quittungstelegramm versenden
+                            DEBUG.fine("Quittungs-Telegramm wird versendet.");
+                            _countReceiptDataTel = 0;
+                            _sendKeepAliveTel    = false;
+                            _sendQuittTel        = false;
+
+                            TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(_lastReceiptSeqNumDataTel, TLSoIPFrame.TELTYPE_QUITT, null);
+
                             _sendBuffer.clear();
+                            _sendBuffer.put(tlsoIPFrame.getTel());
+                            _sendBuffer.flip();
+                        }
 
-                            int size = 43;
+                        if (_sendKeepAliveTel) {
 
-                            _sendBuffer.putInt(_wanComVersion);
-                            _sendBuffer.putInt(size);
-                            _sendBuffer.putInt(_wanComKeepAliveType);
-                            _sendBuffer.putInt(0);
-                            _sendBuffer.putInt(0);
-                            _sendBuffer.put(_wanComIp8);
-                            _sendBuffer.put((byte) 9);
-                            _sendBuffer.put((byte) 255);
-                            _sendBuffer.put((byte) 255);
-                            _sendBuffer.put((byte) 0);
-                            _sendBuffer.put((byte) 0);
-                            _sendBuffer.put((byte) 0);
-                            _sendBuffer.put((byte) 1);
-                            _sendBuffer.put((byte) 7);
-                            _sendBuffer.put((byte) 134);
-                            _sendBuffer.put((byte) 2);
-                            _sendBuffer.put((byte) 0);
-                            _sendBuffer.put((byte) 1);
-                            _sendBuffer.put((byte) 2);
-                            _sendBuffer.put((byte) 255);
-                            _sendBuffer.put((byte) 130);
+                            // KeepAlive-Telegramm versenden
+                            DEBUG.fine("KeepAlive-Telegramm wird versendet.");
+                            _sendKeepAliveTel = false;
+
+                            TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(0, TLSoIPFrame.TELTYPE_KEEPALIVE, null);
+
+                            _sendBuffer.clear();
+                            _sendBuffer.put(tlsoIPFrame.getTel());
                             _sendBuffer.flip();
                         } else {
-                            Server.PriorizedByteArray priorizedByteArray = (Server.PriorizedByteArray) _sendChannel.poll(0);
 
-                            if (priorizedByteArray != null) {
-                                final byte[] bytes = priorizedByteArray.getBytes();
+                            // Daten-Telegramm versenden
+                            // Prüfen, ob überhaupt noch weitere Datentelegramme versand werden dürfen
+                            // Wenn tlsoip.C_ReceiptCount = 0, dann ist Quittierungsüberwachung beim Versand ausgeschaltet.
+                            if ((_countSendDataTel >= _tlsoipCReceiptCount) && (_tlsoipCReceiptCount > 0)) {
+                                DEBUG.warning(String.format("Datenversand wegen fehlender Quittung angehalten. Versandte Datentelegramme %d >= Parameter tlsoip.C_ReceiptCount %d", _countSendDataTel, _tlsoipCReceiptCount));
+                            } else {
 
-                                if (bytes == null) {
-                                    closeChannel();
-                                } else {
-                                    _packetOnTheAir = bytes;
-                                    _debug.finer("Senden eines TLS-Telegramms");
-                                    _debug.finest("eingetragene lokale IP: " + _wanComIp8[0] + "." + _wanComIp8[1] + "." + _wanComIp8[2] + "." + _wanComIp8[3] + "." + _wanComIp8[4] + "." + _wanComIp8[5] + "." + _wanComIp8[6] + "." + _wanComIp8[7]);
-                                    _sendBuffer.clear();
+                                // Prüfen, ob Daten zum Versand anliegen
+                                PriorizedByteArray priorizedByteArray = (Server.PriorizedByteArray) _sendChannel.poll(0L);
 
-                                    int size = 28 + bytes.length;
+                                if (priorizedByteArray != null) {
+                                    final byte[] bytes = priorizedByteArray.getBytes();
 
-                                    _sendBuffer.putInt(_wanComVersion);
-                                    _sendBuffer.putInt(size);
-                                    _sendBuffer.putInt(_wanComTlsType);
-                                    _sendBuffer.putInt(0);
-                                    _sendBuffer.putInt(0);
-                                    _sendBuffer.put(_wanComIp8);
-                                    _sendBuffer.put(bytes);
-                                    _sendBuffer.flip();
+                                    if (bytes == null) {
+                                        closeChannel();
+                                    } else {
+
+                                        // TLS-Telegramm verschicken
+                                        DEBUG.fine("Senden eines TLS-Telegramms");
+                                        _packetOnTheAir = bytes;
+
+                                        int nextSendSeqNumDataTel = getNextSeqNum(_lastSendSeqNumDataTel);
+
+                                        _lastSendSeqNumDataTel = nextSendSeqNumDataTel;
+                                        _countSendDataTel++;
+                                        _lastSendTimeDataTel = System.currentTimeMillis();
+
+                                        TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(nextSendSeqNumDataTel, TLSoIPFrame.TELTYPE_IB_V1, bytes);
+
+                                        _sendBuffer.clear();
+                                        _sendBuffer.put(tlsoIPFrame.getTel());
+                                        _sendBuffer.flip();
+                                    }
                                 }
                             }
                         }
                     }
 
                     if (_sendBuffer.hasRemaining()) {
-                        _debug.finest("Sendeversuch für verbleibende " + _sendBuffer.remaining() + " Bytes");
+                        DEBUG.finest(String.format("Sendeversuch für verbleibende %d Bytes", _sendBuffer.remaining()));
 
                         int sent = _socketChannel.write(_sendBuffer);
 
-                        _debug.finest("erfolgreich gesendete Bytes " + sent);
+                        DEBUG.finest(String.format("erfolgreich gesendete Bytes %d", sent));
                     }
 
                     if (_sendBuffer.hasRemaining()) {
-                        _debug.finer("Versand wird sobald möglich fortgesetzt");
+                        DEBUG.finer("Versand wird sobald möglich fortgesetzt");
                         _socketChannel.register(selector, SelectionKey.OP_WRITE | SelectionKey.OP_READ, this);
 
                         break;
@@ -772,6 +965,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                         if (_packetOnTheAir != null) {
                             byte[] sentPacket = _packetOnTheAir;
 
+                            // noinspection AssignmentToNull
                             _packetOnTheAir = null;
                             notifyEvent(DataLinkLayerEvent.Type.DATA_SENT, sentPacket);
                         }
@@ -780,25 +974,26 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             }
             catch (InterruptedException e) {
                 e.printStackTrace();
-                _debug.warning("unerwartete Exception: " + e);
+                DEBUG.warning(String.format("Unerwartete Exception: %s", e));
             }
             catch (IOException e) {
-                _debug.warning("Verbindung wird wegen Fehler beim Senden initialisiert: " + e);
+                DEBUG.warning(String.format("Verbindung wird wegen Fehler beim Senden initialisiert: %s", e));
                 closeChannel();
             }
         }
 
         /**
-         * Verarbeitet asynchrone Kommunikationsoperationen anhand der vom Selektor des Protokoll-Threads gelieferten Möglichkeiten
+         * Verarbeitet asynchrone Kommunikationsoperationen anhand der vom Selektor des Protokoll-Threads gelieferten
+         * Möglichkeiten
          *
          * @param selectionKey Vom Selektor des Protokoll-Threads gelieferte Kommunikationsmöglichkeiten
          * @param selector     Selektor des Protokoll-Threads zum asynchronen Zugriff auf die Kommunikationskanäle.
          */
         public void handleSelection(SelectionKey selectionKey, Selector selector) {
-            _debug.finer("handleSelection(" + selectionKey.readyOps() + "/" + selectionKey.interestOps() + "): " + this);
+            DEBUG.finer(String.format("handleSelection(%d/%d): %s", selectionKey.readyOps(), selectionKey.interestOps(), this));
 
             if (selectionKey.isAcceptable()) {
-                _debug.fine("Verbindungsaufbau akzeptieren");
+                DEBUG.fine("Verbindungsaufbau akzeptieren");
                 connectSocketChannel(selector);
             }
 
@@ -806,104 +1001,118 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                 return;
             }
 
+            // Es liegen Daten zum Lesen an...
             if (selectionKey.isReadable()) {
-                _debug.finest("Telegramm-Daten empfangen");
+                DEBUG.finest("Telegramm-Daten empfangen");
 
                 try {
-                    _debug.finest("_readBuffer vorm lesen: " + _readBuffer);
 
-                    // HexDumper.dumpTo(System.out,_readBuffer.array(),0, _readBuffer.position());
-                    int got = _socketChannel.read(_readBuffer);
+                    // DEBUG.finest(String.format("_readBuffer vor dem Lesen: (%s), Daten: (%s)", _readBuffer, HexDumper.toString(_readBuffer.array(), 0, _readBuffer.position())));
+                    DEBUG.finest(String.format("_readBuffer vor dem Lesen: (%s)", _readBuffer));
 
-                    if (got == -1) {
-                        _debug.info("Verbindung wurde von der Gegenseite terminiert; " + this);
+                    int count = _socketChannel.read(_readBuffer);
+
+                    if (count == -1) {
+                        DEBUG.info(String.format("Verbindung wurde von der Gegenseite terminiert; %s", this));
                         closeChannel();
                     } else {
-                        _debug.finest("Anzahl gelesener Bytes: " + got);
-
-                        // _debug.finer("_readBuffer", _readBuffer);
-                        // HexDumper.dumpTo(System.out,_readBuffer.array(),0, _readBuffer.position());
+                        DEBUG.finest(String.format("Anzahl gelesener Bytes: %d", count));
                         _readBuffer.flip();
 
                         int remaining;
 
-                        _debug.finest("_readBuffer: " + _readBuffer);
+                        // DEBUG.finest(String.format("_readBuffer nach dem Lesen: (%s), Daten: (%s)", _readBuffer, HexDumper.toString(_readBuffer.array(), 0, _readBuffer.position())));
+                        DEBUG.finest(String.format("_readBuffer vor dem Lesen: (%s)", _readBuffer));
 
-                        while ((remaining = _readBuffer.remaining()) >= 28) {
-                            int telegramPosition = _readBuffer.position();
-                            int telegramVersion  = _readBuffer.getInt(telegramPosition + 0);
-                            int telegramSize     = _readBuffer.getInt(telegramPosition + 4);
+                        while ((remaining = _readBuffer.remaining()) >= 10) {
 
-                            _debug.finest("version: " + telegramVersion);
-                            _debug.finest("size: " + telegramSize);
+                            // Zeit für letztes empfangenes Telegramm setzten
+                            _lastReceiptTimeAllTel = System.currentTimeMillis();
+
+                            // Header einlesen
+                            TLSoIPFrame tlSoIPFrame = new TLSoIPFrame(_readBuffer);
 
                             try {
-                                if (telegramVersion != _wanComVersion) {
-                                    throw new Server.IllegalTelegramException("Falsche WanCom Version: " + telegramVersion);
+
+                                // Test, ob erstes Byte 0x68 enthält, sonst wurde kein TLS over IP-Telegramm empfangen
+                                if (!tlSoIPFrame.isTLSoIPFrame()) {
+                                    throw new Server.IllegalTelegramException(String.format("Telegramm ist kein TLSoIP-Telegramm, Byte Sync ist nicht (68h bzw. 104dez) sondern (%ddez)", tlSoIPFrame.getSync()));
                                 }
 
-                                if (telegramSize < 28) {
-                                    throw new Server.IllegalTelegramException("Empfangene WanCom-Telegrammgröße ist zu klein: " + telegramSize);
+                                // Quittungs-Telegramm prüfen und entsprechende Quittungs-Zustände setzten
+                                if (tlSoIPFrame.isQuittTel()) {
+
+                                    // Zeitpunkt der letzten Quittierung setzen (wird einfach als letztes gesendetes Datentelegramm gewertet für die Zeitüberwachung)
+                                    _lastSendTimeDataTel = System.currentTimeMillis();
+
+                                    // Prüfen, ob SeqNummer korrekt ist
+                                    if (tlSoIPFrame.getSeqNum() == _lastSendSeqNumDataTel) {
+
+                                        // Anzahl der nicht quittierten gesendeten Telegramm zurücksetzten.
+                                        _countSendDataTel = 0;
+                                    }
                                 }
 
-                                if (telegramSize > 2204) {
-                                    throw new Server.IllegalTelegramException("Empfangene WanCom-Telegrammgröße ist zu groß: " + telegramSize);
+                                // KeepAlive-Telegramm prüfen und entsprechende KeepAlive-Zustände setzten
+                                if (tlSoIPFrame.isKeepAliveTel()) {
+
+                                    // Nichts tun: Beim Verbindungsaufbau werden die KeepAliveTimer gesetzt und nei Zeiten aufgerufen.
+                                    // Beim Aufruf wird entschieden, ob KeepAlive-Empfangs-Telegramm notwendig gewesen wäre und
+                                    // ggf. der nächste späteste Zeitpunkt registriert.
+                                    DEBUG.finer("KeepAlive-Telegramm empfangen");
                                 }
 
-                                if (remaining >= telegramSize) {
-                                    int telegramType               = _readBuffer.getInt(telegramPosition + 8);
-                                    int telegramDestinationIpCount = _readBuffer.getInt(telegramPosition + 12);
+                                // Datentelegramm empfangen
+                                if (tlSoIPFrame.isDataTel()) {
 
-                                    if ((telegramDestinationIpCount < 0) || (telegramDestinationIpCount > 16)) {
-                                        throw new Server.IllegalTelegramException("Ungültige Anzahl IP-Adressen im WanCom im Telegramm: " + telegramDestinationIpCount);
+                                    // Test, ob maximale Telegrammlänge nicht überschritten wurde (> 253 Byte)
+                                    if (tlSoIPFrame.getLen() > getMaximumDataSize()) {
+                                        throw new Server.IllegalTelegramException(String.format("Empfangene TLSoIP-Datenlänge ist zu groß (maximal %d Byte) : %s", tlSoIPFrame.getLen(), remaining));
                                     }
 
-                                    int telegramDestinationIpPointer = _readBuffer.getInt(telegramPosition + 16);
+                                    // Falls genug Daten zum Lesen vorhanden sind
+                                    if ((remaining = _readBuffer.remaining()) >= tlSoIPFrame.getLen()) {
+                                        tlSoIPFrame.addData(_readBuffer);
+                                        DEBUG.finer(String.format("TLS Datentelegramm empfangen: %s", tlSoIPFrame.toString()));
 
-                                    if ((telegramDestinationIpPointer < 0) || (telegramDestinationIpPointer > telegramDestinationIpCount)) {
-                                        throw new Server.IllegalTelegramException("Ungültiger IP-Adress-Zeiger im WanCom im Telegramm: " + telegramDestinationIpCount);
-                                    }
+                                        // Empfangene Sequenznummer prüfen
+                                        if (!(tlSoIPFrame.getSeqNum() == getNextSeqNum(_lastReceiptSeqNumDataTel))) {
+                                            int lastReceiptSeqNumDataTelOnlyForDebug = _lastReceiptSeqNumDataTel;
 
-                                    int payloadOffset = 5 * 4 + 8 + telegramDestinationIpCount * 8;
+                                            _lastReceiptSeqNumDataTel = tlSoIPFrame.getSeqNum();
 
-                                    if (payloadOffset > telegramSize) {
-                                        throw new Server.IllegalTelegramException("Berechneter Start der Nutzdaten liegt ausserhalb des Telegramms: " + payloadOffset);
-                                    }
-
-                                    int payloadSize = telegramSize - payloadOffset;
-
-                                    if (telegramDestinationIpPointer != telegramDestinationIpCount) {
-                                        _debug.warning("IP-Routing in Wan-Com Telegrammen wird nicht unterstützt");
-                                    } else {
-                                        if (telegramType == _wanComKeepAliveType) {
-                                            _debug.finer("keepAlive Telegramm empfangen; " + this);
-                                            _lastKeepAliveReceive         = System.currentTimeMillis();
-                                            _keepAliveReceiveTimeoutCount = 0;
-                                        } else if (telegramType == _wanComTlsTypeReceive) {
-
-                                            // TLS Telegramm verarbeiten
-                                            _debug.finer("TLS Telegramm empfangen; " + this);
-                                            _readBuffer.position(telegramPosition + payloadOffset);
-
-                                            byte[] payload = new byte[payloadSize];
-
-                                            _readBuffer.get(payload);
-                                            notifyEvent(DataLinkLayerEvent.Type.DATA_RECEIVED, payload);
+                                            throw new Server.IllegalTelegramException(String.format("Empfangene SeqNum (%d) entspricht nicht der erwarteten SeqNum (%d)!", tlSoIPFrame.getSeqNum(), getNextSeqNum(lastReceiptSeqNumDataTelOnlyForDebug)));
                                         } else {
-                                            throw new Server.IllegalTelegramException("Ungültiger WanCom Type im Telegramm: " + telegramType);
+
+                                            // Neue Nummer als letzte Nummer merken
+                                            _lastReceiptSeqNumDataTel = tlSoIPFrame.getSeqNum();
+
+                                            // Zeit für letztes empfangenes Daten-Telegramm setzten (erst hier, weil jetzt als gültig akzeptiert)
+                                            _lastReceiptTimeDataTel = System.currentTimeMillis();
+
+                                            // Anzahl der empfangenen Datentelegramme seit der letzten Quittung prüfen und ggf. Quittung versenden
+                                            _countReceiptDataTel++;
+
+                                            if (_countReceiptDataTel == _tlsoipCReceiptCount) {
+
+                                                // Wenn Anzahl der Datentelegramme, nach der Quittiert werden muss, erreicht ist, sofort Quittieren...
+                                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, 1);
+                                            } else {
+
+                                                // ...sonst spätenstens nach Ablauf der EmpfangDelays Quittieren
+                                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay);
+                                            }
+
+                                            // Datenempfang melden...
+                                            notifyEvent(DataLinkLayerEvent.Type.DATA_RECEIVED, tlSoIPFrame.getData());
                                         }
+                                    } else {
+                                        throw new Server.IllegalTelegramException(String.format("Länge des Datenblocks laut Header (%d) kleiner als vorhandene Anzahl der Nutzdaten (%d)", tlSoIPFrame.getLen(), remaining));
                                     }
-
-                                    _readBuffer.position(telegramPosition + telegramSize);
-                                } else {
-
-                                    // Nicht genügend Bytes im Puffer => Warten auf weitere Daten
-                                    break;
                                 }
                             }
                             catch (Server.IllegalTelegramException e) {
-                                e.printStackTrace();
-                                _debug.error(e.getLocalizedMessage());
+                                DEBUG.error(e.getLocalizedMessage(), e);
                                 closeChannel();
 
                                 return;
@@ -944,13 +1153,16 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             _worker.notify(this, action);
         }
 
-        /** Initiiert den Abbruch und erneuten Verbindungsaufbau einer bestehenden Verbindung mit evtl. geänderten Parametern */
+        /**
+         * Initiiert den Abbruch und erneuten Verbindungsaufbau einer bestehenden Verbindung mit evtl. geänderten
+         * Parametern
+         */
         public void reload() {
-            _debug.fine("reload " + this);
+            DEBUG.fine(String.format("reload %s", this));
 
             synchronized (_protocolLock) {
                 if ((_protocolState == ProtocolState.STARTED) || (_protocolState == ProtocolState.STARTING)) {
-                    notifyWorker(Server.ActionType.RELOAD_CALLED);
+                    notifyWorker(ActionType.RELOAD_CALLED);
                 }
             }
         }
@@ -980,16 +1192,15 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
          * @throws InterruptedException Wenn der aktuelle Thread unterbrochen wurde.
          */
         public void send(byte[] bytes, int priority) throws InterruptedException {
-            _debug.finer("Telegramm soll gesendet werden, Priorität: " + priority);
+            DEBUG.finer(String.format("Telegramm soll gesendet werden:%nPriorität: %d%nDaten: %s", priority, HexDumper.toString(bytes)));
 
-            // _debug.finer("Daten: " + HexDumper.toString(bytes));
             synchronized (_linkLock) {
                 if (_linkState != LinkState.CONNECTED) {
-                    throw new IllegalStateException("Telegramm kann in diesem Verbindungszustand nicht versendet werden: " + _linkState);
+                    throw new IllegalStateException(String.format("Telegramm kann in diesem Verbindungszustand nicht versendet werden: %s", _linkState));
                 }
             }
 
-            _debug.finest("Telegramm wird zum Versand gepuffert, Priorität: " + priority);
+            DEBUG.finest(String.format("Telegramm wird zum Versand gepuffert, Priorität: %d", priority));
             _sendChannel.put(new Server.PriorizedByteArray(bytes, priority));
             notifyWorker(Server.ActionType.SEND_CALLED);
         }
@@ -1015,7 +1226,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
         /** Initiiert das Schließen der bestehenden Verbindung dieses Verbindungsobjekts */
         public void shutdown() {
-            _debug.fine("shutdown " + this);
+            DEBUG.fine(String.format("shutdown %s", this));
 
             synchronized (_linkLock) {
                 if ((_linkState == LinkState.DISCONNECTED) || (_linkState == LinkState.DISCONNECTING)) {
@@ -1043,8 +1254,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
     private static class PriorizedByteArray implements PriorizedObject {
 
         /**
-         * Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass keine weiteren Telegramme mehr versendet werden
-         * sollen.
+         * Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass
+         * keine weiteren Telegramme mehr versendet werden sollen.
          */
         private final byte[] _bytes;
 
@@ -1056,8 +1267,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         /**
          * Erzeugt ein neues Objekt mit den angegebenen Eigenschaften.
          *
-         * @param bytes    Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass keine weiteren Telegramme mehr
-         *                 versendet werden sollen.
+         * @param bytes    Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code>
+         *                 signalisiert, dass keine weiteren Telegramme mehr versendet werden sollen.
          * @param priority Priorität des zu versendenden Telegramms. Kleinere Werte haben höhere Priorität.
          */
         public PriorizedByteArray(byte[] bytes, int priority) {
@@ -1068,8 +1279,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         //~ GET METHODEN ======================================================
 
         /**
-         * @return Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass keine weiteren Telegramme mehr
-         *         versendet werden sollen.
+         * @return Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code>
+         *         signalisiert, dass keine weiteren Telegramme mehr versendet werden sollen.
          */
         public byte[] getBytes() {
             return _bytes;
@@ -1082,12 +1293,15 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
     }
 
 
-    /** Klasse die das Runnable-Interface implementiert, vom Protokollthread ausgeführt wird und den Protokollablauf steuert */
+    /**
+     * Klasse die das Runnable-Interface implementiert, vom Protokollthread ausgeführt wird und den Protokollablauf
+     * steuert
+     */
     private class Worker implements Runnable {
 
         /**
-         * Selektor-Objekt, mit dessen Hilfe alle Kommunikationsoperationen (Verbindungsaufbau, Versand und Empfang von Daten) ohne zusätzliche Threads asynchron
-         * ausgeführt werden.
+         * Selektor-Objekt, mit dessen Hilfe alle Kommunikationsoperationen (Verbindungsaufbau, Versand und Empfang von
+         * Daten) ohne zusätzliche Threads asynchron ausgeführt werden.
          */
         private final Selector _selector;
 
@@ -1096,53 +1310,64 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
         //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==========
 
-        /** Konstruktor initialisiert den Selektor und die Queue zur Übermittlung von Aktionen */
+        /**
+         * Konstruktor initialisiert den Selektor und die Queue zur Übermittlung von Aktionen.
+         *
+         * @throws IOException wenn eine nicht abgefangene Ausnahme auftritt.
+         */
         public Worker() throws IOException {
             _selector  = Selector.open();
-            _workQueue = new UnboundedQueue<Server.Worker.WorkAction>();
+            _workQueue = new UnboundedQueue<WorkAction>();
         }
 
         //~ METHODEN ==========================================================
 
         /**
-         * Kann von einem beliebigen Thread aufgerufen werden, um dem Protokoll-Thread zu signalisieren, dass eine bestimmte Aktion ausgeführt werden soll
+         * Kann von einem beliebigen Thread aufgerufen werden, um dem Protokoll-Thread zu signalisieren, dass eine
+         * bestimmte Aktion ausgeführt werden soll.
          *
          * @param link   Verbindung, auf die sich die Aktion bezieht.
          * @param action Durchzuführende Aktion
          */
         public void notify(Server.Link link, Server.ActionType action) {
-            _workQueue.put(new Server.Worker.WorkAction(link, action));
-            _debug.finer("Aufruf von _selector.wakeup()");
+            _workQueue.put(new WorkAction(link, action));
+            DEBUG.finer("Aufruf von _selector.wakeup()");
             _selector.wakeup();
         }
 
-        /** Methode, die beim Start des Protokoll-Threads aufgerufen wird und die asynchrone Protokollsteuerung implementiert. */
+        /**
+         * Methode, die beim Start des Protokoll-Threads aufgerufen wird und die asynchrone Protokollsteuerung
+         * implementiert.
+         */
         public void run() {
             synchronized (_protocolLock) {
 
                 // Warten bis Protokoll gestartet wird
                 while (_protocolState == ProtocolState.CREATED) {
-                    _debug.fine("Warten auf den Start des Protokolls: " + toString());
+                    DEBUG.fine(String.format("Warten auf den Start des Protokolls: %s", toString()));
 
                     try {
                         _protocolLock.wait();
                     }
                     catch (InterruptedException e) {
                         e.printStackTrace();
-                        _debug.error("Fehler im " + toString() + ": " + e);
+                        DEBUG.error(String.format("Fehler im %s: %s", toString(), e));
                     }
                 }
             }
 
             // Hier wird 30 Sekunden gewartet, um der TLS-OSI-7 genügend Zeit zur Initialisierung zu geben
-            _debug.fine("WanCom: 30 Sekunden warten: " + toString());
+            DEBUG.fine("TSLoIP: 30 Sekunden warten: " + toString());
 
             try {
                 Thread.sleep(30000);
             }
-            catch (InterruptedException e) {}
+            catch (InterruptedException e) {
 
-            _debug.fine("WanCom: Beginn der Protokollabarbeitung: " + toString());
+                // nichts zu tun
+            }
+
+            DEBUG.fine("TLSoIP: Beginn der Protokollabarbeitung: " + toString());
 
             while (true) {
                 try {
@@ -1163,7 +1388,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
                         // wird beim nächsten Schleifendurchlauf im synchronized Block (oben) behandelt
                     } else if ((state == ProtocolState.STARTED) || (state == ProtocolState.STOPPING)) {
-                        _debug.finest("Protokoll arbeitet: " + this);
+                        DEBUG.finest(String.format("Protokoll arbeitet: %s", this));
 
                         Server.Worker.WorkAction action;
 
@@ -1172,11 +1397,11 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                         }
 
                         try {
-                            _debug.finest("Aufruf von select()");
+                            DEBUG.finest("Aufruf von select()");
 
-                            int count = _selector.select();
+                            int count = _selector.select();  // ACHTUNG: Aufruf blockiert, bis Anforderung anliegt.
 
-                            _debug.finest("Rückgabe von select(): " + count);
+                            DEBUG.finest(String.format("Rückgabe von select(): %d", count));
 
                             Set<SelectionKey> selectedKeys = _selector.selectedKeys();
 
@@ -1194,32 +1419,40 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             e.printStackTrace();
                         }
                     } else if (state == ProtocolState.STOPPED) {
-                        _debug.fine("Protokoll wurde gestoppt: " + this);
+                        DEBUG.fine(String.format("Protokoll wurde gestoppt: %s", this));
 
                         break;
                     } else {
-                        _debug.error("ungültiger Zustand: " + state + "; " + this);
+                        DEBUG.error(String.format("Ungültiger Zustand: %s; %s", state, this));
                     }
                 }
                 catch (InterruptedException e) {
-                    _debug.warning("InterruptedException: " + this, e);
+                    DEBUG.warning(String.format("InterruptedException: %s", this), e);
                 }
                 catch (RuntimeException e) {
-                    _debug.warning("Unerwarteter Fehler: " + e.getLocalizedMessage() + "; " + this, e);
+                    DEBUG.warning(String.format("Unerwarteter Fehler: %s; %s", e.getLocalizedMessage(), this), e);
                 }
             }
 
-            _debug.warning("Thread wird terminiert: " + this);
+            DEBUG.warning(String.format("Thread wird terminiert: %s", this));
         }
 
-        /** @return Informationen dieses Objekts für Debug-Zwecke */
+        /**
+         * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke. Das genaue Format ist nicht festgelegt und kann
+         * sich ändern..
+         *
+         * @return Informationen dieses Objekts für Debug-Zwecke
+         */
         public String toString() {
-            return "Worker für " + Server.this.toString();
+            return String.format("Worker für %s", Server.this.toString());
         }
 
         //~ INNERE KLASSEN ====================================================
 
-        /** Hilfsklasse, die zur Speicherung einer Aktion zusammen mit der Verbindung, auf die sich die Aktion bezieht, eingesetzt wird. */
+        /**
+         * Hilfsklasse, die zur Speicherung einer Aktion zusammen mit der Verbindung, auf die sich die Aktion bezieht,
+         * eingesetzt wird.
+         */
         class WorkAction {
 
             /** Zur Speicherung der Aktion */
@@ -1243,14 +1476,18 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
             //~ METHODEN ======================================================
 
-            /** @return Informationen dieses Objekts für Debug-Zwecke */
+            /**
+             * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke. Das genaue Format ist nicht festgelegt und
+             * kann sich ändern..
+             *
+             * @return Informationen dieses Objekts für Debug-Zwecke
+             */
             public String toString() {
-                return "WorkAction(link: " + _link + ", action: " + _action;
+                return String.format("WorkAction(link: %s, action: %s", _link, _action);
             }
         }
     }
 }
 
 
-
-//~Formatiert mit 'inovat Kodierkonvention' am 04/05/10
+//~Formatiert mit 'inovat Kodierkonvention' am 06.04.10

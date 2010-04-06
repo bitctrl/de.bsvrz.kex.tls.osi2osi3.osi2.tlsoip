@@ -50,19 +50,30 @@ public class TLSoIPFrame {
 
     /** DebugLogger für Debug-Ausgaben. */
     private static final Debug DEBUG               = Debug.getLogger();
+	/** Länge des Frame-Headers */
     public static final int    FRAME_HEADER_LENGTH = 10;
+	/** Sync-Byte (0x68) des Frame-Headers */
     public static final byte   FRAME_HEADER_SYNC   = (byte) 0x68;
+	/** Telegrammtyp Datentelegramm Inselbus */
     public static final byte   TELTYPE_IB_V1       = (byte) 0x11;
+	/** Telegrammtyp Keep-Alive */
     public static final byte   TELTYPE_KEEPALIVE   = (byte) 0x80;
+	/** Telegrammtyp Quittung */
     public static final byte   TELTYPE_QUITT       = (byte) 0x90;
 
     //~ FELDER ================================================================
 
+	/** Datenbytes */
     byte               _data[]   = null;
+	/** Headerbytes */
     private final byte _header[] = new byte[FRAME_HEADER_LENGTH];
+	/** Längenangabe im Telegramm */
     private long       _len;
+	/** Sequenznummer im Telegramm */
     private int        _seqNum;
+	/** Sync-Byte im Telegramm */
     private byte       _sync;
+	/** Telegrammtyp-Byte im Telegramm */
     private byte       _telType;
 
     //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==============
@@ -90,8 +101,8 @@ public class TLSoIPFrame {
      * Legt ein TLSoIP Telegramm an.
      *
      * @param seqNum  Sequenznummer des Telegramms.
-     * @param telType Telegrammtyp (TELTYPE_IB_V1 , TELTYPE_KEEPALIVE , TELTYPE_QUITT )
-     * @param data    Wenn telType = TELTYPE_IB_V1, die Nutzdaten, sonst <code>null</code>.
+     * @param telType Telegrammtyp ({@link #TELTYPE_IB_V1} , {@link #TELTYPE_KEEPALIVE} , {@link #TELTYPE_QUITT} )
+     * @param data    Wenn telType = {@link #TELTYPE_IB_V1}, die Nutzdaten, sonst <code>null</code>.
      */
     public TLSoIPFrame(int seqNum, byte telType, byte data[]) {
         constuctTLSoIPFrame(FRAME_HEADER_SYNC, seqNum, telType, data, -1L);
@@ -121,7 +132,7 @@ public class TLSoIPFrame {
      * @param sync    Sync-Zeichen (normalerweise immer 0x68)
      * @param seqNum  Sequenznummer des Telegramms.
      * @param telType Telegrammtyp ({@link #TELTYPE_IB_V1} , {@link #TELTYPE_KEEPALIVE} , {@link #TELTYPE_QUITT} )
-     * @param data    Wenn telType = TELTYPE_IB_V1, die Nutzdaten, sonst <code>null</code>.
+     * @param data    Wenn telType = {@link #TELTYPE_IB_V1}, die Nutzdaten, sonst <code>null</code>.
      * @param len     Wenn <code>data != null</code>, dann wird Länge aus tatsächlicher Nutzdatenlänge ermittelt, ansonsten
      *                wird für len < 0 der Wert 0 und sonst der übergebene Wert eingestellt.
      */
@@ -257,25 +268,25 @@ public class TLSoIPFrame {
     /**
      * Testet, ob es sich um ein Daten-Telegramm handelt.
      *
-     * @return <code>true</code>, wenn Telegrammtyp == TELTYPE_IB_V1, sonst <code>false</code>.
+     * @return <code>true</code>, wenn Telegrammtyp == {@link #TELTYPE_IB_V1}, sonst <code>false</code>.
      */
     public boolean isDataTel() {
         return _telType == TELTYPE_IB_V1;
     }
 
     /**
-     * Testet, ob es sich um ein KeepAlive-Telegramm .
+     * Testet, ob es sich um ein KeepAlive-Telegramm handelt.
      *
-     * @return <code>true</code>, wenn Telegrammtyp == TELTYPE_KEEPALIVE, sonst <code>false</code>.
+     * @return <code>true</code>, wenn Telegrammtyp == {@link #TELTYPE_KEEPALIVE}, sonst <code>false</code>.
      */
     public boolean isKeepAliveTel() {
         return _telType == TELTYPE_KEEPALIVE;
     }
 
     /**
-     * Testet, ob es sich um ein Quittierungs-Telegramm .
+     * Testet, ob es sich um ein Quittierungs-Telegramm handelt.
      *
-     * @return <code>true</code>, wenn Telegrammtyp == TELTYPE_QUITT, sonst <code>false</code>.
+     * @return <code>true</code>, wenn Telegrammtyp == {@link #TELTYPE_QUITT}, sonst <code>false</code>.
      */
     public boolean isQuittTel() {
         return _telType == TELTYPE_QUITT;
@@ -284,7 +295,7 @@ public class TLSoIPFrame {
     /**
      * Testet, ob es sich um ein gültiges TLSoIP-Telegramm handelt.
      *
-     * @return <code>true</code>, wenn erstes Byte im Header == 0x68, sonst <code>false</code>.
+     * @return <code>true</code>, wenn erstes Byte im Header == {@link #FRAME_HEADER_SYNC}, sonst <code>false</code>.
      */
     public boolean isTLSoIPFrame() {
         return _sync == FRAME_HEADER_SYNC;

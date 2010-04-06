@@ -57,15 +57,46 @@ import java.util.Properties;
  * Datenübertragung über TCP/IP (TLSoIP):
  * <p>
  * Verbindungsparameter für beide Verbindungspartner:
- *
- *
+ * <p>
+ * <table cellpadding="2" cellspacing="2" border="1">
+ * <tr> <th> Name </th> <th> Defaultwert </th> <th> Beschreibung </th> </tr>
+ * <tr> <td> tlsoip.C_HelloDelay </td> <td> 30 </td> <td> Zeit [s], nach der ein Keep-Alive-Telegramm an die Gegenstelle versendet werden muss (0=ausgeschaltet für Testzwecke, 1...3599). </td> </tr>
+ * <tr> <td> tlsoip.C_HelloTimeout </td> <td> 60 </td> <td> Zeit [s], nach der spätestens ein Keep-Alive-Telegramm der Gegenstelle erwartet wird ( > C_HelloDelay der Gegenstelle), (0=ausgeschaltet für Testzwecke, 1...3600). </td> </tr>
+ * <tr> <td> tlsoip.C_ReceiptCount </td> <td> 10 </td> <td> Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein Quittungstelegramm versendet werden muss/erwartet wird (1..255). </td> </tr>
+ * <tr> <td> tlsoip.C_ReceiptDelay </td> <td> 15 </td> <td> Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die Gegenstelle versendet werden muss (1..59). </td> </tr>
+ * <tr> <td> tlsoip.C_ReceiptTimeout </td> <td> 30 </td> <td> Zeit [s], nach der spätestens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der Gegenstelle) (1..60). </td> </tr>
+ * <tr> <td> tlsoip.C_SecureConnection </td> <td> nein </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT (immer nein): Verbindung wird ohne SSL betrieben (nein), Verbindung wird mit SSL betrieben (ja). </td> </tr>
+ * </table>
+ * <p/>
  * <p>
  * Verbindungsparameter für den Client:
- *
- *
+ * <p>
+ * <table cellpadding="2" cellspacing="2" border="1">
+ * <tr> <th> Name </th> <th> Defaultwert </th> <th> Beschreibung </th> </tr>
+ * <tr> <td> tlsoip.C_ServerAdrA </td> <td>  </td> <td> IP-Adresse des Servers. </td> </tr>
+ * <tr> <td> tlsoip.C_AcceptPortA </td> <td>  </td>  <td> Portnummer des Servers. </td> </tr>
+ * <tr> <td> tlsoip.C_ReconnectDelay </td> <td> 20 </td> <td> Zeit [s], nach der bei Nichtbestehen einer Verbindung spätestens ein neuer Verbindungsaufbau initiiert werden muss (0=sofort, 1...3600). </td> </tr>
+ * <tr> <td> tlsoip.C_ConnectDuration </td> <td> 0 </td> <td> AKTUELL WIRD NUR "0=immer" UNTERSTÜTZT!<br> Dauer [s], für die eine Verbindung vom Client aufrecht erhalten werden soll (0=immer, 1...3600). </td> </tr>
+ * <tr> <td> tlsoip.C_ConnectDelay </td> <td> 00 05 00 </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Zeit [hh mm ss], nach der zur Prüfung der Erreichbarkeit des Servers ein Verbindungsaufbau stattfinden muss (optional, nur für temporäre Verbindungen) (00 00 01...23 59 59). </td> </tr>
+ * <tr> <td> tlsoip.C_ServerAdrB </td> <td>  </td><td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> IP-Adresse des Alternativ-Servers </td> </tr>
+ * <tr> <td> tlsoip.C_AcceptPortB </td> <td>  </td><td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Portnummer des Alternativ-Servers </td> </tr>
+ * <tr> <td> tlsoip.waitForInitialReceive </td> <td> nein </td> <td> Wenn "ja", dann wartet das Protokoll nach dem Aufbau der TCP-Verbindung auf den Empfang eines initialen Telegramms, bevor eine Verbindung als "lebt" gemeldet wird. </td> </tr>
+ * </table>
+ * <p/>
  * <p>
  * Verbindungsparameter für den Server:
- *
+ * <p>
+ * <table cellpadding="2" cellspacing="2" border="1">
+ * <tr> <th> Name </th> <th> Defaultwert </th> <th> Beschreibung </th> </tr>
+ * <tr> <td> tlsoip.C_AcceptPort </td> <td>  </td> <td> Dynamische und oder Private Ports (49152 bis 65535) gemäß IANA konfigurierbar, auf dem der Server anfragen entgegen nimmt. </td> </tr>
+ * <tr> <td> tlsoip.C_PortMode </td> <td> aktiv </td> <td> AKTUELL WIRD NUR "AKTIV" UNTERSTÜTZT!<br> Portmodus (aktiv/passiv). Passiv nur für Mithörschnittstellen. </td> </tr>
+ * <tr> <td> tlsoip.C_ClientCount </td> <td> 1 </td> <td> AKTUELL WIRD NUR PortMode "AKTIV" mit ClientClount "1" UNTERSTÜTZT!<br> Anzahl der unterstützten Ports (1..255), bei aktiven Ports immer gleich 1. </td> </tr>
+ * <tr> <td> tlsoip.C_ActivePort </td> <td>  </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Bei passiven Ports: Zugeordneter aktiver Port. </td> </tr>
+ * <tr> <td> tlsoip.C_XmitRequest </td> <td> nein </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Bei passiven Ports: Übertragung der Telegramme in Abrufrichtung (ja/nein). </td> </tr>
+ * <tr> <td> tlsoip.C_XmitAnswer </td> <td> nein </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Bei passiven Ports: Übertragung der Telegramme in Antwortrichtung (ja/nein). </td> </tr>
+ * <tr> <td> tlsoip.C_TelTypeList </td> <td>  </td> <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Bei passiven Ports: Liste der erlaubten TelType (OSI-2 TLSoIP). </td> </tr>
+ * </table>
+ * <p/>
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
  * @author Dipl.-Ing. Hans Christian Kniß (HCK)
