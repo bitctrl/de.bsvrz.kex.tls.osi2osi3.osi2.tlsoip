@@ -218,5 +218,4 @@ class DefaultProperties extends Properties {
 }
 
 
-
-//~Formatiert mit 'inovat Kodierkonvention' am 04/05/10
+//~Formatiert mit 'inovat Kodierkonvention' am 06.04.10

@@ -49,32 +49,42 @@ import java.nio.ByteBuffer;
 public class TLSoIPFrame {
 
     /** DebugLogger für Debug-Ausgaben. */
-    private static final Debug DEBUG               = Debug.getLogger();
-	/** Länge des Frame-Headers */
-    public static final int    FRAME_HEADER_LENGTH = 10;
-	/** Sync-Byte (0x68) des Frame-Headers */
-    public static final byte   FRAME_HEADER_SYNC   = (byte) 0x68;
-	/** Telegrammtyp Datentelegramm Inselbus */
-    public static final byte   TELTYPE_IB_V1       = (byte) 0x11;
-	/** Telegrammtyp Keep-Alive */
-    public static final byte   TELTYPE_KEEPALIVE   = (byte) 0x80;
-	/** Telegrammtyp Quittung */
-    public static final byte   TELTYPE_QUITT       = (byte) 0x90;
+    private static final Debug DEBUG = Debug.getLogger();
+
+    /** Länge des Frame-Headers */
+    public static final int FRAME_HEADER_LENGTH = 10;
+
+    /** Sync-Byte (0x68) des Frame-Headers */
+    public static final byte FRAME_HEADER_SYNC = (byte) 0x68;
+
+    /** Telegrammtyp Datentelegramm Inselbus */
+    public static final byte TELTYPE_IB_V1 = (byte) 0x11;
+
+    /** Telegrammtyp Keep-Alive */
+    public static final byte TELTYPE_KEEPALIVE = (byte) 0x80;
+
+    /** Telegrammtyp Quittung */
+    public static final byte TELTYPE_QUITT = (byte) 0x90;
 
     //~ FELDER ================================================================
 
-	/** Datenbytes */
-    byte               _data[]   = null;
-	/** Headerbytes */
+    /** Längenangabe im Telegramm */
+    private long _len;
+
+    /** Sequenznummer im Telegramm */
+    private int _seqNum;
+
+    /** Sync-Byte im Telegramm */
+    private byte _sync;
+
+    /** Telegrammtyp-Byte im Telegramm */
+    private byte _telType;
+
+    /** Datenbytes */
+    byte _data[] = null;
+
+    /** Headerbytes */
     private final byte _header[] = new byte[FRAME_HEADER_LENGTH];
-	/** Längenangabe im Telegramm */
-    private long       _len;
-	/** Sequenznummer im Telegramm */
-    private int        _seqNum;
-	/** Sync-Byte im Telegramm */
-    private byte       _sync;
-	/** Telegrammtyp-Byte im Telegramm */
-    private byte       _telType;
 
     //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==============
 
@@ -106,6 +116,30 @@ public class TLSoIPFrame {
      */
     public TLSoIPFrame(int seqNum, byte telType, byte data[]) {
         constuctTLSoIPFrame(FRAME_HEADER_SYNC, seqNum, telType, data, -1L);
+    }
+
+    //~ GET METHODEN ==========================================================
+
+    /**
+     * Liefert eine textuelle Beschreibung der unterstützten Telegrammtypen.
+     *
+     * @param telType Code des Telegrammtyps.
+     *
+     * @return Textuelle Beschreibung der unterstützten Telegrammtypen.
+     */
+    public static String getTelTypeInfo(int telType) {
+        switch ((byte) (telType & 0xff)) {
+        case TELTYPE_IB_V1 :
+            return "0x11 [Telegramm mit TLS-Daten]";
+
+        case TELTYPE_KEEPALIVE :
+            return "0x80 [Kontroll-Telegramm Keep-Alive]";
+
+        case TELTYPE_QUITT :
+            return "0x90 [Kontroll-Telegramm Quittung]";
+        }
+
+        return "Unbekannter Telegrammtyp";
     }
 
     //~ METHODEN ==============================================================
@@ -244,28 +278,6 @@ public class TLSoIPFrame {
     }
 
     /**
-     * Liefert eine textuelle Beschreibung der unterstützten Telegrammtypen.
-     *
-     * @param telType Code des Telegrammtyps.
-     *
-     * @return Textuelle Beschreibung der unterstützten Telegrammtypen.
-     */
-    public static String getTelTypeInfo(int telType) {
-        switch ((byte) (telType & 0xff)) {
-        case TELTYPE_IB_V1 :
-            return "0x11 [Telegramm mit TLS-Daten]";
-
-        case TELTYPE_KEEPALIVE :
-            return "0x80 [Kontroll-Telegramm Keep-Alive]";
-
-        case TELTYPE_QUITT :
-            return "0x90 [Kontroll-Telegramm Quittung]";
-        }
-
-        return "Unbekannter Telegrammtyp";
-    }
-
-    /**
      * Testet, ob es sich um ein Daten-Telegramm handelt.
      *
      * @return <code>true</code>, wenn Telegrammtyp == {@link #TELTYPE_IB_V1}, sonst <code>false</code>.
@@ -310,5 +322,4 @@ public class TLSoIPFrame {
 }
 
 
-
-//~Formatiert mit 'inovat Kodierkonvention' am 04/05/10
+//~Formatiert mit 'inovat Kodierkonvention' am 06.04.10

@@ -444,8 +444,9 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         private Properties _properties = null;
 
         /** IP-Adresse des Servers */
-        private String  _tlsoipCServerAdrA                  = null;
-	    /** Internes Flag für die Verwaltung des Initialen Telegramms. */
+        private String _tlsoipCServerAdrA = null;
+
+        /** Internes Flag für die Verwaltung des Initialen Telegramms. */
         private boolean _tcpConnectedWaitingForFirstReceive = false;
 
         /** Timerobjekt mit dem zukünftige Aktionen geplant und ausgeführt werden */
@@ -921,7 +922,6 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                                         TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(nextSendSeqNumDataTel, TLSoIPFrame.TELTYPE_IB_V1, bytes);
 
                                         _sendBuffer.clear();
-
                                         _sendBuffer.put(tlsoIPFrame.getTel());
                                         _sendBuffer.flip();
                                     }

@@ -359,7 +359,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
     /** Signalisiert fehlerhafte Zust‰nde in empfangenen Telegrammen */
     private static class IllegalTelegramException extends Exception {
-	    /**
+
+        /**
          * Erzeugt eine neue Ausnahme mit einer spezifischen Fehlerbeschreibung
          *
          * @param message Spezifische Fehlerbeschreibung der Ausnahme
@@ -552,8 +553,9 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                         DEBUG.warning("Fehler beim Schlieﬂen des ServerSocketChannels: " + e);
                     }
                     finally {
-	                    //noinspection AssignmentToNull
-	                    _serverSocketChannel = null;
+
+                        // noinspection AssignmentToNull
+                        _serverSocketChannel = null;
                     }
                 }
 
@@ -633,13 +635,13 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             _packetOnTheAir = null;
 
                             // Verbindungs- und Kommunikationsparameter einlesen
-                            _tlsoipCAcceptPort           = _propertyConsultant.getIntProperty("tlsoip.C_AcceptPort");
-                            _tlsoipCHelloDelay           = _propertyConsultant.getIntProperty("tlsoip.C_HelloDelay");
-                            _tlsoipCHelloTimeout         = _propertyConsultant.getIntProperty("tlsoip.C_HelloTimeout");
-                            _tlsoipCReceiptCount         = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptCount");
-                            _tlsoipCReceiptDelay         = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptDelay");
-                            _tlsoipCReceiptTimeout       = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptTimeout");
-                            _serverSocketChannel         = ServerSocketChannel.open();
+                            _tlsoipCAcceptPort     = _propertyConsultant.getIntProperty("tlsoip.C_AcceptPort");
+                            _tlsoipCHelloDelay     = _propertyConsultant.getIntProperty("tlsoip.C_HelloDelay");
+                            _tlsoipCHelloTimeout   = _propertyConsultant.getIntProperty("tlsoip.C_HelloTimeout");
+                            _tlsoipCReceiptCount   = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptCount");
+                            _tlsoipCReceiptDelay   = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptDelay");
+                            _tlsoipCReceiptTimeout = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptTimeout");
+                            _serverSocketChannel   = ServerSocketChannel.open();
                             _serverSocketChannel.configureBlocking(false);
                             _serverSocketChannel.socket().bind(new InetSocketAddress(_tlsoipCAcceptPort));
                             DEBUG.info(String.format("Server aktzeptiert Verbindung auf Port %d; %s", _tlsoipCAcceptPort, this));
