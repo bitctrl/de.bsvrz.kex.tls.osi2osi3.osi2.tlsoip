@@ -27,7 +27,7 @@
 
 package de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip;
 
-//~--- non-JDK imports --------------------------------------------------------
+//~ NICHT JDK IMPORTE =========================================================
 
 import de.bsvrz.dav.daf.main.ClientDavInterface;
 import de.bsvrz.kex.tls.osi2osi3.osi2.api.AbstractDataLinkLayer;
@@ -42,7 +42,7 @@ import de.bsvrz.sys.funclib.concurrent.UnboundedQueue;
 import de.bsvrz.sys.funclib.debug.Debug;
 import de.bsvrz.sys.funclib.hexdump.HexDumper;
 
-//~--- JDK imports ------------------------------------------------------------
+//~ JDK IMPORTE ===============================================================
 
 import java.io.IOException;
 
@@ -61,6 +61,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+
+//~ KLASSEN ===================================================================
 
 /**
  * Klasse, die als OSI-2 Protokollmodul für den client-seitige Teil einer TLSoIP-Verbindung eingesetzt werden kann.
@@ -104,6 +106,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
     /** Logger für Debugausgaben */
     private static final Debug DEBUG = Debug.getLogger();
 
+    //~ FELDER ================================================================
+
     /** Runnable Objekt, das vom Protokollthread ausgeführt wird und den Protokollablauf steuert */
     final Client.Worker _worker = new Client.Worker();
 
@@ -122,6 +126,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
     /** Thread des Protokolls */
     private final Thread _workThread;
 
+    //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==============
+
     /**
      * Default-Konstruktor, mit dem neue TLSoverIP-Client Protokolle instanziiert werden können.
      *
@@ -131,6 +137,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         DEBUG.fine("TLSoIP-CLient (Konstruktoraufruf)");
         _workThread = new Thread(_worker, "TLSoIP.Client.Worker");
     }
+
+    //~ METHODEN ==============================================================
 
     /** Bricht die Kommunikation auf allen Verbindungen des Protokolls sofort ab und beendet anschließend das Protokoll. */
     public void abort() {
@@ -164,6 +172,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         return new Client.Link(remoteAddress);
     }
 
+    //~ GET METHODEN ==========================================================
+
     /**
      * Bestimmt, ob die Kommunikation dieses Protokolls bereits mit der Methode {@link #start} aktiviert wurde.
      *
@@ -175,6 +185,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             return (_protocolState == ProtocolState.STARTING) || (_protocolState == ProtocolState.STARTED);
         }
     }
+
+    //~ SET METHODEN ==========================================================
 
     /**
      * Nimmmt die Verbindung zum Datenverteiler entgegen. Diese Methode wird vom OSI-3 Modul nach dem
@@ -203,6 +215,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             }
         }
     }
+
+    //~ METHODEN ==============================================================
 
     /** Terminiert alle Verbindungen des Protokolls und beendet anschließend das Protokoll. */
     public void shutdown() {
@@ -237,8 +251,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             int localAddress = getLocalAddress();
 
             if ((localAddress < 1) || (localAddress > 254)) {
-                throw new IllegalStateException(
-                    String.format("lokale OSI-2 Adresse muss zwischen 1 und 254 liegen, ist: %d", localAddress));
+                throw new IllegalStateException(String.format("lokale OSI-2 Adresse muss zwischen 1 und 254 liegen, ist: %d", localAddress));
             }
 
             _workThread.setName(String.format("TLSoIP.Client.Worker(%d)", localAddress));
@@ -257,6 +270,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
     public String toString() {
         return String.format("TLSoIP-Client(%d, %s) ", getLocalAddress(), _protocolState);
     }
+
+    //~ INNERE KLASSEN ========================================================
 
     /** Definiert die Aktionscodes, die von den API-Methoden zur Steuerung des Protokoll-Threads versendet werden */
     public static class ActionType {
@@ -286,14 +301,17 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         public static final Client.ActionType KEEPALIVE_TIMER_SEND = new Client.ActionType("KEEPALIVE_TIMER_SEND");
 
         /** Signalisiert dem Protokoll-Thread, das ein der Empfang von Keep-Alive-Telegrammen geprüft werden soll */
-        public static final Client.ActionType KEEPALIVE_TIMER_RECEIVE =
-            new Client.ActionType("KEEPALIVE_TIMER_RECEIVE");
+        public static final Client.ActionType KEEPALIVE_TIMER_RECEIVE = new Client.ActionType("KEEPALIVE_TIMER_RECEIVE");
 
         /** Signalisiert dem Protokoll-Thread, das die Kommunikation auf einer Verbindung abgebrochen werden soll */
         public static final Client.ActionType ABORT_CALLED = new Client.ActionType("ABORT_CALLED");
 
+        //~ FELDER ============================================================
+
         /** Name der Aktion für Debugzwecke */
-        private final String _name;    // for debug only
+        private final String _name;  // for debug only
+
+        //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==========
 
         /**
          * Erzeugt ein neues Aktionsobjekt mit vorgegebenem Namen
@@ -303,6 +321,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         private ActionType(String name) {
             _name = name;
         }
+
+        //~ METHODEN ==========================================================
 
         /**
          * Gibt Informationen des ActionType für Debugzwecke zurück.
@@ -424,6 +444,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
          */
         private boolean _tlsoipWaitForInitialReceive;
 
+        //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==========
+
         /**
          * Erzeugt ein neues Verbindungsobjekt.
          *
@@ -434,10 +456,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             _propertyConsultant = new PropertyConsultant(this);
 
             if ((remoteAddress < 1) || (remoteAddress > 255)) {
-                throw new IllegalArgumentException(
-                    String.format(
-                        "OSI-2 Adresse muss zwischen 1 und 254 liegen oder den speziellen Wert 255 (Broadcastaddresse) haben, versorgt ist: %d",
-                        remoteAddress));
+                throw new IllegalArgumentException(String.format("OSI-2 Adresse muss zwischen 1 und 254 liegen oder den speziellen Wert 255 (Broadcastaddresse) haben, versorgt ist: %d", remoteAddress));
             }
 
             _sendChannel = new PriorityChannel(3, 1000);
@@ -448,15 +467,15 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             synchronized (_protocolLock) {
                 for (Link link : _links) {
                     if (link.getRemoteAddress() == _remoteAddress) {
-                        throw new IllegalStateException(
-                            String.format(
-                                "Es gibt bereits ein Verbindung mit dieser Secondary-Adresse: %d", _remoteAddress));
+                        throw new IllegalStateException(String.format("Es gibt bereits ein Verbindung mit dieser Secondary-Adresse: %d", _remoteAddress));
                     }
                 }
 
                 _links.add(this);
             }
         }
+
+        //~ METHODEN ==========================================================
 
         /** Initiiert den sofortigen Abbruch der bestehenden Verbindung dieses Verbindungsobjekts */
         public void abort() {
@@ -472,7 +491,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
             try {
                 _sendChannel.put(new Client.PriorizedByteArray(null, 0));
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 e.printStackTrace();
 
                 throw new RuntimeException(e);
@@ -504,9 +524,11 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                 if (_socketChannel != null) {
                     try {
                         _socketChannel.close();
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e) {
                         DEBUG.warning(String.format("Fehler beim Schließen des SocketChannels: %s", e));
-                    } finally {
+                    }
+                    finally {
 
                         // noinspection AssignmentToNull
                         _socketChannel = null;
@@ -525,9 +547,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                     DEBUG.fine(String.format("Nächster Verbundungsversuch in %d Sekunden; %s", reconnectDelay, this));
                     scheduleActionTimer(Client.ActionType.RETRY_CONNECT, reconnectDelay);
                 } else {
-                    DEBUG.error(
-                        String.format(
-                            "closeChannel: Unmöglicher Zustand: Fehler ohne bestehende Verbindung; %s", this));
+                    DEBUG.error(String.format("closeChannel: Unmöglicher Zustand: Fehler ohne bestehende Verbindung; %s", this));
                     _linkState = LinkState.DISCONNECTED;
                 }
             }
@@ -544,8 +564,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                     }
 
                     if (_linkState != LinkState.DISCONNECTED) {
-                        throw new IllegalStateException(
-                            String.format("Verbindung kann in diesem Zustand nicht aufgebaut werden: %s", _linkState));
+                        throw new IllegalStateException(String.format("Verbindung kann in diesem Zustand nicht aufgebaut werden: %s", _linkState));
                     }
 
                     _linkState = LinkState.CONNECTING;
@@ -585,18 +604,13 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             _tlsoipCHelloTimeout         = _propertyConsultant.getIntProperty("tlsoip.C_HelloTimeout");
                             _tlsoipCReceiptCount         = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptCount");
                             _tlsoipCReceiptDelay         = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptDelay");
-                            _tlsoipCReceiptTimeout       =
-                                _propertyConsultant.getIntProperty("tlsoip.C_ReceiptTimeout");
-                            _tlsoipCReconnectDelay       =
-                                _propertyConsultant.getIntProperty("tlsoip.C_ReconnectDelay");
-                            _tlsoipWaitForInitialReceive =
-                                _propertyConsultant.getBooleanProperty("tlsoip.waitForInitialReceive");
-                            _socketChannel = SocketChannel.open();
+                            _tlsoipCReceiptTimeout       = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptTimeout");
+                            _tlsoipCReconnectDelay       = _propertyConsultant.getIntProperty("tlsoip.C_ReconnectDelay");
+                            _tlsoipWaitForInitialReceive = _propertyConsultant.getBooleanProperty("tlsoip.waitForInitialReceive");
+                            _socketChannel               = SocketChannel.open();
                             _socketChannel.configureBlocking(false);
-                            DEBUG.info(String.format("Verbindungsversuch zu %s:%d wird gestartet; %s",
-                                                     _tlsoipCServerAdrA, _tlsoipCAcceptPortA, this));
-                            connectFinished = _socketChannel.connect(new InetSocketAddress(_tlsoipCServerAdrA,
-                                    _tlsoipCAcceptPortA));
+                            DEBUG.info(String.format("Verbindungsversuch zu %s:%d wird gestartet; %s", _tlsoipCServerAdrA, _tlsoipCAcceptPortA, this));
+                            connectFinished = _socketChannel.connect(new InetSocketAddress(_tlsoipCServerAdrA, _tlsoipCAcceptPortA));
                         } else {
                             connectFinished = _socketChannel.finishConnect();
                         }
@@ -608,8 +622,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             _lastSendTimeAllTel       = System.currentTimeMillis();
                             _lastReceiptTimeDataTel   = System.currentTimeMillis();
                             _lastReceiptTimeAllTel    = System.currentTimeMillis();
-                            _lastReceiptSeqNumDataTel = 0xffff;    // Als nächstes wird die 0 erwartet
-                            _lastSendSeqNumDataTel    = 0xffff;    // Als nächstes wird die 0 erwartet
+                            _lastReceiptSeqNumDataTel = 0xffff;  // Als nächstes wird die 0 erwartet
+                            _lastSendSeqNumDataTel    = 0xffff;  // Als nächstes wird die 0 erwartet
                             _countReceiptDataTel      = 0;
                             _countSendDataTel         = 0;
                             _sendKeepAliveTel         = true;
@@ -629,32 +643,26 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE, _tlsoipCHelloTimeout);
                             scheduleActionTimer(ActionType.KEEPALIVE_TIMER_SEND, _tlsoipCHelloDelay);
                         } else {
-                            DEBUG.info(
-                                String.format(
-                                    "Verbindungsaufbau ist noch nicht abgeschlossen und wird asynchron durchgeführt; %s",
-                                    this));
+                            DEBUG.info(String.format("Verbindungsaufbau ist noch nicht abgeschlossen und wird asynchron durchgeführt; %s", this));
                             _socketChannel.register(selector, SelectionKey.OP_CONNECT, this);
                         }
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
 
                         // Um einzelne Verbindungen zu Testzwecken auszuschalten, muss die IP-Host-Adresse (tlsoip.C_ServerAdrA) auf "" gesetzt werden,
                         if ((_tlsoipCServerAdrA == null) || _tlsoipCServerAdrA.equals("")) {
-                            DEBUG.warning(
-                                String.format(
-                                    "Verbindungsversuch wird dauerhaft deaktiviert, da Parameter 'tlsoip.C_ServerAdrA' nicht gesetzt ist: %s",
-                                    this));
-                            closeChannel(Integer.MAX_VALUE);    // Reconnect auf ewig verzögern ...
+                            DEBUG.warning(String.format("Verbindungsversuch wird dauerhaft deaktiviert, da Parameter 'tlsoip.C_ServerAdrA' nicht gesetzt ist: %s", this));
+                            closeChannel(Integer.MAX_VALUE);  // Reconnect auf ewig verzögern ...
                         } else {
-                            DEBUG.warning(
-                                String.format(
-                                    "Verbindung wird deaktiviert: %s. Nächster Verbindungsaufbau in %s Sekunden.",
-                                    this, _tlsoipCReconnectDelay));
+                            DEBUG.warning(String.format("Verbindung wird deaktiviert: %s. Nächster Verbindungsaufbau in %s Sekunden.", this, _tlsoipCReconnectDelay));
                             closeChannel();
                         }
                     }
                 }
             }
         }
+
+        //~ GET METHODEN ======================================================
 
         /** @return Das zu dieser Verbindung gehörende Protokollmodul */
         public DataLinkLayer getDataLinkLayer() {
@@ -683,15 +691,13 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
          */
         public String getProperty(String name) {
             synchronized (_linkLock) {
-                String value = (_properties == null)
-                               ? null
-                               : _properties.getProperty(name);
+                String value = (_properties == null) ? null : _properties.getProperty(name);
 
-                return (value == null)
-                       ? Client.this.getProperty(name)
-                       : value;
+                return (value == null) ? Client.this.getProperty(name) : value;
             }
         }
+
+        //~ METHODEN ==========================================================
 
         /**
          * Führt eine Aktion für dieses Verbindungsobjekt aus. Diese Methode wird vom Protokoll-Thread zur Verarbeitung einer Aktion aufgerufen.
@@ -722,28 +728,22 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                         // Prüfen, ob KeepAlive-Überwachung für den Empfang nicht ausgeschaltet ist (zu Testzwecken)
                         if (_tlsoipCHelloTimeout == 0) {
-                            DEBUG.info(
-                                "KeepAlive-Überwachung für den Empfang ist ausgeschaltet (tlsoip.C_HelloTimeout = 0)");
+                            DEBUG.info("KeepAlive-Überwachung für den Empfang ist ausgeschaltet (tlsoip.C_HelloTimeout = 0)");
                         } else {
 
                             // Zeitraum [s], seit letztes Telegramm empfangen wurde
-                            int durationSinceLastReceiptAllTel = (int) ((System.currentTimeMillis()
-                                                                     - _lastReceiptTimeAllTel) / 1000L);
+                            int durationSinceLastReceiptAllTel = (int) ((System.currentTimeMillis() - _lastReceiptTimeAllTel) / 1000L);
 
                             // Hätte KeepAlive-Telegramm bereits empfangen werden müssen?
                             if (_tlsoipCHelloTimeout < durationSinceLastReceiptAllTel) {
 
                                 // Ja. Verbindung abbrechen und nach Wartezeit neu aufbauen.
-                                DEBUG.warning(
-                                    String.format(
-                                        "Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes KeepAlive vor %ds > Parameter tlsoip.C_HelloTimeout %d",
-                                        durationSinceLastReceiptAllTel, _tlsoipCHelloTimeout));
+                                DEBUG.warning(String.format("Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes KeepAlive vor %ds > Parameter tlsoip.C_HelloTimeout %d", durationSinceLastReceiptAllTel, _tlsoipCHelloTimeout));
                                 closeChannel();
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen
-                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE,
-                                                    _tlsoipCHelloTimeout - durationSinceLastReceiptAllTel);
+                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE, _tlsoipCHelloTimeout - durationSinceLastReceiptAllTel);
                             }
                         }
                     }
@@ -756,14 +756,12 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                         // Prüfen, ob KeepAlive-Überwachung für das Senden nicht ausgeschaltet ist (zu Testzwecken)
                         if (_tlsoipCHelloDelay == 0) {
-                            DEBUG.info(
-                                "KeepAlive-Überwachung für das Senden ist ausgeschaltet (tlsoip.C_HelloDelay = 0)");
+                            DEBUG.info("KeepAlive-Überwachung für das Senden ist ausgeschaltet (tlsoip.C_HelloDelay = 0)");
                             _sendKeepAliveTel = false;
                         } else {
 
                             // Zeitraum [s], seit letztes Telegramm gesendet wurde
-                            int durationSinceLastSendAllTel = (int) ((System.currentTimeMillis() - _lastSendTimeAllTel)
-                                                                  / 1000L);
+                            int durationSinceLastSendAllTel = (int) ((System.currentTimeMillis() - _lastSendTimeAllTel) / 1000L);
 
                             // Muss KeepAlive-Telegramm versendet werden ?
                             if (_tlsoipCHelloDelay < durationSinceLastSendAllTel) {
@@ -774,8 +772,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen.
-                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE,
-                                                    _tlsoipCHelloDelay - durationSinceLastSendAllTel);
+                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE, _tlsoipCHelloDelay - durationSinceLastSendAllTel);
                             }
                         }
                     }
@@ -786,28 +783,22 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                         // Prüfen, ob Quittierungs-Überwachung für den Empfang nicht ausgeschaltet ist (zu Testzwecken)
                         if (_tlsoipCReceiptTimeout == 0) {
-                            DEBUG.info(
-                                "Quittierungs-Überwachung für versandte Daten-Telegramme ist ausgeschaltet (tlsoip.C_ReceiptTimeout = 0)");
+                            DEBUG.info("Quittierungs-Überwachung für versandte Daten-Telegramme ist ausgeschaltet (tlsoip.C_ReceiptTimeout = 0)");
                         } else {
 
                             // Zeitraum [s], seit letztes Daten-Telegramm verschickt wurde
-                            int durationSinceLastSendDataTel = (int) ((System.currentTimeMillis()
-                                                                   - _lastSendTimeDataTel) / 1000L);
+                            int durationSinceLastSendDataTel = (int) ((System.currentTimeMillis() - _lastSendTimeDataTel) / 1000L);
 
                             // Hätte Quittierungs-Telegramm bereits empfangen werden müssen?
                             if (_tlsoipCReceiptTimeout < durationSinceLastSendDataTel) {
 
                                 // Ja. Verbindung abbrechen und nach Wartezeit neu aufbauen.
-                                DEBUG.warning(
-                                    String.format(
-                                        "Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes Quittungs-Telegramm vor %ds > Parameter tlsoip.C_ReceiptTimeout %d",
-                                        durationSinceLastSendDataTel, _tlsoipCReceiptTimeout));
+                                DEBUG.warning(String.format("Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes Quittungs-Telegramm vor %ds > Parameter tlsoip.C_ReceiptTimeout %d", durationSinceLastSendDataTel, _tlsoipCReceiptTimeout));
                                 closeChannel();
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen
-                                scheduleActionTimer(ActionType.QUITT_TIMER_RECEIVE,
-                                                    _tlsoipCReceiptTimeout - durationSinceLastSendDataTel);
+                                scheduleActionTimer(ActionType.QUITT_TIMER_RECEIVE, _tlsoipCReceiptTimeout - durationSinceLastSendDataTel);
                             }
                         }
                     }
@@ -820,18 +811,15 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                         // Prüfen, ob Quittungs-Überwachung für das Senden nicht ausgeschaltet ist (zu Testzwecken)
                         if (_tlsoipCReceiptDelay == 0) {
-                            DEBUG.info(
-                                "Quittierungs-Überwachung für empfangene Daten-Telegramme ist ausgeschaltet (tlsoip.C_ReceiptDelay = 0)");
+                            DEBUG.info("Quittierungs-Überwachung für empfangene Daten-Telegramme ist ausgeschaltet (tlsoip.C_ReceiptDelay = 0)");
                             _sendQuittTel = false;
                         } else {
 
                             // Zeitraum [s], seit letztes Daten-Telegramm empfangen wurde
-                            int durationSinceLastReceiptDataTel = (int) ((System.currentTimeMillis()
-                                                                      - _lastReceiptTimeDataTel) / 1000L);
+                            int durationSinceLastReceiptDataTel = (int) ((System.currentTimeMillis() - _lastReceiptTimeDataTel) / 1000L);
 
                             // Muss Quittierungs-Telegramm versendet werden ?
-                            if ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel)
-                                    || (_countReceiptDataTel >= _tlsoipCReceiptCount)) {
+                            if ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount)) {
 
                                 // Ja (erfolgt in handleAsyncSend()). Zusätzlich Timer für nächsten spätesten Versand setzten.
                                 _sendQuittTel = true;
@@ -839,8 +827,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen.
-                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND,
-                                                    _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
+                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
                             }
                         }
                     }
@@ -874,8 +861,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             _sendKeepAliveTel    = false;
                             _sendQuittTel        = false;
 
-                            TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(_lastReceiptSeqNumDataTel,
-                                                          TLSoIPFrame.TELTYPE_QUITT, null);
+                            TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(_lastReceiptSeqNumDataTel, TLSoIPFrame.TELTYPE_QUITT, null);
 
                             _sendBuffer.clear();
                             _sendBuffer.put(tlsoIPFrame.getTel());
@@ -899,15 +885,11 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             // Prüfen, ob überhaupt noch weitere Datentelegramme versand werden dürfen
                             // Wenn tlsoip.C_ReceiptCount = 0, dann ist Quittierungsüberwachung beim Versand ausgeschaltet.
                             if ((_countSendDataTel >= _tlsoipCReceiptCount) && (_tlsoipCReceiptCount > 0)) {
-                                DEBUG.warning(
-                                    String.format(
-                                        "Datenversand wegen fehlender Quittung angehalten. Versandte Datentelegramme %d >= Parameter tlsoip.C_ReceiptCount %d",
-                                        _countSendDataTel, _tlsoipCReceiptCount));
+                                DEBUG.warning(String.format("Datenversand wegen fehlender Quittung angehalten. Versandte Datentelegramme %d >= Parameter tlsoip.C_ReceiptCount %d", _countSendDataTel, _tlsoipCReceiptCount));
                             } else {
 
                                 // Prüfen, ob Daten zum Versand anliegen
-                                PriorizedByteArray priorizedByteArray =
-                                    (Client.PriorizedByteArray) _sendChannel.poll(0L);
+                                PriorizedByteArray priorizedByteArray = (Client.PriorizedByteArray) _sendChannel.poll(0L);
 
                                 if (priorizedByteArray != null) {
                                     final byte[] bytes = priorizedByteArray.getBytes();
@@ -926,10 +908,10 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                                         _countSendDataTel++;
                                         _lastSendTimeDataTel = System.currentTimeMillis();
 
-                                        TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(nextSendSeqNumDataTel,
-                                                                      TLSoIPFrame.TELTYPE_IB_V1, bytes);
+                                        TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(nextSendSeqNumDataTel, TLSoIPFrame.TELTYPE_IB_V1, bytes);
 
                                         _sendBuffer.clear();
+
                                         // ToDo: Senden ausgeschaltet für Daten _sendBuffer.put(tlsoIPFrame.getTel());
                                         _sendBuffer.flip();
                                     }
@@ -961,10 +943,12 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                         }
                     }
                 } while (!_sendChannel.isEmpty());
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 e.printStackTrace();
                 DEBUG.warning(String.format("Unerwartete Exception: %s", e));
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 DEBUG.warning(String.format("Verbindung wird wegen Fehler beim Senden initialisiert: %s", e));
                 closeChannel();
             }
@@ -977,8 +961,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
          * @param selector     Selektor des Protokoll-Threads zum asynchronen Zugriff auf die Kommunikationskanäle.
          */
         public void handleSelection(SelectionKey selectionKey, Selector selector) {
-            DEBUG.finer(String.format("handleSelection(%d/%d): %s", selectionKey.readyOps(),
-                                      selectionKey.interestOps(), this));
+            DEBUG.finer(String.format("handleSelection(%d/%d): %s", selectionKey.readyOps(), selectionKey.interestOps(), this));
 
             // TLSoIP: DIFFCLIENT ANFANG
             if (selectionKey.isConnectable()) {
@@ -998,21 +981,21 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                 try {
 
-//                  DEBUG.finest(String.format("_readBuffer vor dem Lesen: (%s), Daten: (%s)", _readBuffer, HexDumper.toString(_readBuffer.array(), 0, _readBuffer.position())));
+                    // DEBUG.finest(String.format("_readBuffer vor dem Lesen: (%s), Daten: (%s)", _readBuffer, HexDumper.toString(_readBuffer.array(), 0, _readBuffer.position())));
                     DEBUG.finest(String.format("_readBuffer vor dem Lesen: (%s)", _readBuffer));
 
                     int count = _socketChannel.read(_readBuffer);
 
                     if (count == -1) {
-                         DEBUG.info(String.format("Verbindung wurde von der Gegenseite terminiert; %s", this));
-                         closeChannel();
+                        DEBUG.info(String.format("Verbindung wurde von der Gegenseite terminiert; %s", this));
+                        closeChannel();
                     } else {
                         DEBUG.finest(String.format("Anzahl gelesener Bytes: %d", count));
                         _readBuffer.flip();
 
                         int remaining;
 
-//                      DEBUG.finest(String.format("_readBuffer nach dem Lesen: (%s), Daten: (%s)", _readBuffer, HexDumper.toString(_readBuffer.array(), 0, _readBuffer.position())));
+                        // DEBUG.finest(String.format("_readBuffer nach dem Lesen: (%s), Daten: (%s)", _readBuffer, HexDumper.toString(_readBuffer.array(), 0, _readBuffer.position())));
                         DEBUG.finest(String.format("_readBuffer vor dem Lesen: (%s)", _readBuffer));
 
                         while ((remaining = _readBuffer.remaining()) >= 10) {
@@ -1027,10 +1010,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                                 // Test, ob erstes Byte 0x68 enthält, sonst wurde kein TLS over IP-Telegramm empfangen
                                 if (!tlSoIPFrame.isTLSoIPFrame()) {
-                                    throw new Client.IllegalTelegramException(
-                                        String.format(
-                                            "Telegramm ist kein TLSoIP-Telegramm, Byte Sync ist nicht (68h bzw. 104dez) sondern (%ddez)",
-                                            tlSoIPFrame.getSync()));
+                                    throw new Client.IllegalTelegramException(String.format("Telegramm ist kein TLSoIP-Telegramm, Byte Sync ist nicht (68h bzw. 104dez) sondern (%ddez)", tlSoIPFrame.getSync()));
                                 }
 
                                 // Quittungs-Telegramm prüfen und entsprechende Quittungs-Zustände setzten
@@ -1061,30 +1041,26 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                                     // Test, ob maximale Telegrammlänge nicht überschritten wurde (> 253 Byte)
                                     if (tlSoIPFrame.getLen() > getMaximumDataSize()) {
-                                        throw new Client.IllegalTelegramException(
-                                            String.format(
-                                                "Empfangene TLSoIP-Datenlänge ist zu groß (maximal %d Byte) : %s",
-                                                tlSoIPFrame.getLen(), remaining));
+                                        throw new Client.IllegalTelegramException(String.format("Empfangene TLSoIP-Datenlänge ist zu groß (maximal %d Byte) : %s", tlSoIPFrame.getLen(), remaining));
                                     }
 
                                     // Falls genug Daten zum Lesen vorhanden sind
                                     if ((remaining = _readBuffer.remaining()) >= tlSoIPFrame.getLen()) {
                                         tlSoIPFrame.addData(_readBuffer);
-                                        DEBUG.finer(String.format("TLS Datentelegramm empfangen: %s",
-                                                                  tlSoIPFrame.toString()));
+                                        DEBUG.finer(String.format("TLS Datentelegramm empfangen: %s", tlSoIPFrame.toString()));
 
                                         // Empfangene Sequenznummer prüfen
                                         if (!(tlSoIPFrame.getSeqNum() == getNextSeqNum(_lastReceiptSeqNumDataTel))) {
                                             int lastReceiptSeqNumDataTelOnlyForDebug = _lastReceiptSeqNumDataTel;
-	                                        _lastReceiptSeqNumDataTel = tlSoIPFrame.getSeqNum();
 
-                                            throw new Client.IllegalTelegramException(
-                                                String.format(
-                                                    "Empfangene SeqNum (%d) entspricht nicht der erwarteten SeqNum (%d)!",
-                                                    tlSoIPFrame.getSeqNum(), getNextSeqNum(lastReceiptSeqNumDataTelOnlyForDebug)));
+                                            _lastReceiptSeqNumDataTel = tlSoIPFrame.getSeqNum();
+
+                                            throw new Client.IllegalTelegramException(String.format("Empfangene SeqNum (%d) entspricht nicht der erwarteten SeqNum (%d)!", tlSoIPFrame.getSeqNum(), getNextSeqNum(lastReceiptSeqNumDataTelOnlyForDebug)));
                                         } else {
-	                                        // Neue Nummer als letzte Nummer merken
-	                                        _lastReceiptSeqNumDataTel = tlSoIPFrame.getSeqNum();
+
+                                            // Neue Nummer als letzte Nummer merken
+                                            _lastReceiptSeqNumDataTel = tlSoIPFrame.getSeqNum();
+
                                             // Zeit für letztes empfangenes Daten-Telegramm setzten (erst hier, weil jetzt als gültig akzeptiert)
                                             _lastReceiptTimeDataTel = System.currentTimeMillis();
 
@@ -1105,13 +1081,11 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                                             notifyEvent(DataLinkLayerEvent.Type.DATA_RECEIVED, tlSoIPFrame.getData());
                                         }
                                     } else {
-                                        throw new Client.IllegalTelegramException(
-                                            String.format(
-                                                "Länge des Datenblocks laut Header (%d) kleiner als vorhandene Anzahl der Nutzdaten (%d)",
-                                                tlSoIPFrame.getLen(), remaining));
+                                        throw new Client.IllegalTelegramException(String.format("Länge des Datenblocks laut Header (%d) kleiner als vorhandene Anzahl der Nutzdaten (%d)", tlSoIPFrame.getLen(), remaining));
                                     }
                                 }
-                            } catch (Client.IllegalTelegramException e) {
+                            }
+                            catch (Client.IllegalTelegramException e) {
                                 DEBUG.error(e.getLocalizedMessage(), e);
                                 closeChannel();
 
@@ -1121,7 +1095,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                         _readBuffer.compact();
                     }
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -1188,14 +1163,11 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
          * @throws InterruptedException Wenn der aktuelle Thread unterbrochen wurde.
          */
         public void send(byte[] bytes, int priority) throws InterruptedException {
-            DEBUG.finer(String.format("Telegramm soll gesendet werden:%nPriorität: %d%nDaten: %s", priority,
-                                      HexDumper.toString(bytes)));
+            DEBUG.finer(String.format("Telegramm soll gesendet werden:%nPriorität: %d%nDaten: %s", priority, HexDumper.toString(bytes)));
 
             synchronized (_linkLock) {
                 if (_linkState != LinkState.CONNECTED) {
-                    throw new IllegalStateException(
-                        String.format(
-                            "Telegramm kann in diesem Verbindungszustand nicht versendet werden: %s", _linkState));
+                    throw new IllegalStateException(String.format("Telegramm kann in diesem Verbindungszustand nicht versendet werden: %s", _linkState));
                 }
             }
 
@@ -1203,6 +1175,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             _sendChannel.put(new Client.PriorizedByteArray(bytes, priority));
             notifyWorker(Client.ActionType.SEND_CALLED);
         }
+
+        //~ SET METHODEN ======================================================
 
         /**
          * Setzt neue Parameterwerte.
@@ -1219,6 +1193,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             }
         }
 
+        //~ METHODEN ==========================================================
+
         /** Initiiert das Schließen der bestehenden Verbindung dieses Verbindungsobjekts */
         public void shutdown() {
             DEBUG.fine(String.format("shutdown %s", this));
@@ -1233,7 +1209,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
             try {
                 _sendChannel.put(new Client.PriorizedByteArray(null, 2));
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 e.printStackTrace();
 
                 throw new RuntimeException(e);
@@ -1256,6 +1233,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         /** Priorität des zu versendenden Telegramms. Kleinere Werte haben höhere Priorität. */
         private final int _priority;
 
+        //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==========
+
         /**
          * Erzeugt ein neues Objekt mit den angegebenen Eigenschaften.
          *
@@ -1267,6 +1246,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             _bytes    = bytes;
             _priority = priority;
         }
+
+        //~ GET METHODEN ======================================================
 
         /**
          * @return Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass keine weiteren Telegramme mehr
@@ -1295,6 +1276,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         /** Queue zur Übermittlung von Aktionen an den Protokoll-Thread */
         private final UnboundedQueue<WorkAction> _workQueue;
 
+        //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==========
+
         /**
          * Konstruktor initialisiert den Selektor und die Queue zur Übermittlung von Aktionen.
          *
@@ -1304,6 +1287,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             _selector  = Selector.open();
             _workQueue = new UnboundedQueue<WorkAction>();
         }
+
+        //~ METHODEN ==========================================================
 
         /**
          * Kann von einem beliebigen Thread aufgerufen werden, um dem Protokoll-Thread zu signalisieren,
@@ -1331,7 +1316,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                     try {
                         _protocolLock.wait();
-                    } catch (InterruptedException e) {
+                    }
+                    catch (InterruptedException e) {
                         e.printStackTrace();
                         DEBUG.error(String.format("Fehler im %s: %s", toString(), e));
                     }
@@ -1343,7 +1329,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
             try {
                 Thread.sleep(30000);
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
 
                 // nichts zu tun
             }
@@ -1380,7 +1367,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                         try {
                             DEBUG.finest("Aufruf von select()");
 
-                            int count = _selector.select();    // ACHTUNG: Aufruf blockiert, bis Anforderung anliegt.
+                            int count = _selector.select();  // ACHTUNG: Aufruf blockiert, bis Anforderung anliegt.
 
                             DEBUG.finest(String.format("Rückgabe von select(): %d", count));
 
@@ -1395,7 +1382,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                                 selectedLink.handleSelection(selectionKey, _selector);
                             }
-                        } catch (IOException e) {
+                        }
+                        catch (IOException e) {
                             e.printStackTrace();
                         }
                     } else if (state == ProtocolState.STOPPED) {
@@ -1405,9 +1393,11 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                     } else {
                         DEBUG.error(String.format("Ungültiger Zustand: %s; %s", state, this));
                     }
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     DEBUG.warning(String.format("InterruptedException: %s", this), e);
-                } catch (RuntimeException e) {
+                }
+                catch (RuntimeException e) {
                     DEBUG.warning(String.format("Unerwarteter Fehler: %s; %s", e.getLocalizedMessage(), this), e);
                 }
             }
@@ -1425,6 +1415,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             return String.format("Worker für %s", Client.this.toString());
         }
 
+        //~ INNERE KLASSEN ====================================================
+
         /**
          * Hilfsklasse, die zur Speicherung einer Aktion zusammen mit der Verbindung,
          * auf die sich die Aktion bezieht, eingesetzt wird.
@@ -1437,6 +1429,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             /** Zur Speicherung der Verbindung */
             public final Client.Link _link;
 
+            //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ======
+
             /**
              * Erzeugt ein neues Hilfsobjekt für eine Aktion, die an einer Verbindung auszuführen ist.
              *
@@ -1447,6 +1441,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                 _link   = link;
                 _action = action;
             }
+
+            //~ METHODEN ======================================================
 
             /**
              * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke.
@@ -1460,3 +1456,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         }
     }
 }
+
+
+
+//~Formatiert mit 'inovat Kodierkonvention' am 04/05/10
