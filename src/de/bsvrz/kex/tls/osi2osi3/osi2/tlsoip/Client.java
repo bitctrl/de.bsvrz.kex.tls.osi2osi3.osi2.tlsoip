@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2010 by inovat, innovative systeme - verkehr - tunnel - technik, Dipl.-Ing. H. C. Kniss
  *
- * This file is part of de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip.Client                                         
+ * This file is part of de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip.Client
  *
  * de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip.Client is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -519,7 +519,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         }
 
         /**
-         * Schließt den Kommunikationskanal zum Client und plant den erneuten Aufbau der Kommunikationsverbindung
+         * Schließt den Kommunikationskanal zum Server und plant den erneuten Aufbau der Kommunikationsverbindung
          * nach der durch den Parameter "tlsoip.C_ReconnectDelay" parameterierbaren Wartezeit ein.
          */
         private void closeChannel() {
@@ -635,7 +635,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             _lastReceiptTimeAllTel    = System.currentTimeMillis();
                             _lastSendTimeAllTel       = System.currentTimeMillis();
                             _lastReceiptTimeDataTel   = System.currentTimeMillis();
-                            _lastReceiptTimeAllTel    = System.currentTimeMillis();
+                            _lastSendTimeDataTel      = System.currentTimeMillis();
                             _lastReceiptSeqNumDataTel = 0xffff;  // Als nächstes wird die 0 erwartet
                             _lastSendSeqNumDataTel    = 0xffff;  // Als nächstes wird die 0 erwartet
                             _countReceiptDataTel      = 0;
@@ -841,7 +841,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen.
-                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
+                                scheduleActionTimer(Client.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
                             }
                         }
                     }
@@ -870,10 +870,12 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                         if (_sendQuittTel) {
 
                             // Quittungstelegramm versenden
-                            DEBUG.fine("Quittungs-Telegramm wird versendet.");
-                            _countReceiptDataTel = 0;
-                            _sendKeepAliveTel    = false;
-                            _sendQuittTel        = false;
+                            DEBUG.fine(String.format("Quittungs-Telegramm wird versendet für SeqNum [%d]", _lastReceiptSeqNumDataTel));
+                            _countReceiptDataTel    = 0;
+                            _sendKeepAliveTel       = false;
+                            _sendQuittTel           = false;
+                            _lastReceiptTimeDataTel = System.currentTimeMillis();  // Zeitüberwachung für Quittung zurücksetzen
+                            _lastSendTimeAllTel     = System.currentTimeMillis();
 
                             TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(_lastReceiptSeqNumDataTel, TLSoIPFrame.TELTYPE_QUITT, null);
 
@@ -886,7 +888,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                             // KeepAlive-Telegramm versenden
                             DEBUG.fine("KeepAlive-Telegramm wird versendet.");
-                            _sendKeepAliveTel = false;
+                            _sendKeepAliveTel   = false;
+                            _lastSendTimeAllTel = System.currentTimeMillis();
 
                             TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(0, TLSoIPFrame.TELTYPE_KEEPALIVE, null);
 
@@ -921,6 +924,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                                         _lastSendSeqNumDataTel = nextSendSeqNumDataTel;
                                         _countSendDataTel++;
                                         _lastSendTimeDataTel = System.currentTimeMillis();
+                                        _lastSendTimeAllTel  = System.currentTimeMillis();
 
                                         TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(nextSendSeqNumDataTel, TLSoIPFrame.TELTYPE_IB_V1, bytes);
 
@@ -1040,7 +1044,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                                 // KeepAlive-Telegramm prüfen und entsprechende KeepAlive-Zustände setzten
                                 if (tlSoIPFrame.isKeepAliveTel()) {
 
-                                    // Nichts tun: Beim Verbindungsaufbau werden die KeepAliveTimer gesetzt und nei Zeiten aufgerufen.
+                                    // Nichts tun: Beim Verbindungsaufbau werden die KeepAliveTimer gesetzt und bei Zeiten aufgerufen.
                                     // Beim Aufruf wird entschieden, ob KeepAlive-Empfangs-Telegramm notwendig gewesen wäre und
                                     // ggf. der nächste späteste Zeitpunkt registriert.
                                     DEBUG.finer("KeepAlive-Telegramm empfangen");
@@ -1468,4 +1472,4 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 }
 
 
-//~Formatiert mit 'inovat Kodierkonvention' am 06.04.10
+//~Formatiert mit 'inovat Kodierkonvention' am 09.04.10

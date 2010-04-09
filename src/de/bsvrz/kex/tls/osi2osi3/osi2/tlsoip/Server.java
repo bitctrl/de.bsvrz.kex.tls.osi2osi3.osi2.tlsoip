@@ -665,7 +665,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                                 _lastReceiptTimeAllTel    = System.currentTimeMillis();
                                 _lastSendTimeAllTel       = System.currentTimeMillis();
                                 _lastReceiptTimeDataTel   = System.currentTimeMillis();
-                                _lastReceiptTimeAllTel    = System.currentTimeMillis();
+                                _lastSendTimeDataTel      = System.currentTimeMillis();
                                 _lastReceiptSeqNumDataTel = 0xffff;  // Als nächstes wird die 0 erwartet
                                 _lastSendSeqNumDataTel    = 0xffff;  // Als nächstes wird die 0 erwartet
                                 _countReceiptDataTel      = 0;
@@ -861,7 +861,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen.
-                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
+                                scheduleActionTimer(Server.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
                             }
                         }
                     }
@@ -890,10 +890,12 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                         if (_sendQuittTel) {
 
                             // Quittungstelegramm versenden
-                            DEBUG.fine("Quittungs-Telegramm wird versendet.");
+                            DEBUG.fine(String.format("Quittungs-Telegramm wird versendet für SeqNum [%d]", _lastReceiptSeqNumDataTel));
                             _countReceiptDataTel = 0;
                             _sendKeepAliveTel    = false;
                             _sendQuittTel        = false;
+                            _lastReceiptTimeDataTel = System.currentTimeMillis();  // Zeitüberwachung für Quittung zurücksetzen
+                            _lastSendTimeAllTel     = System.currentTimeMillis();
 
                             TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(_lastReceiptSeqNumDataTel, TLSoIPFrame.TELTYPE_QUITT, null);
 
@@ -907,6 +909,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             // KeepAlive-Telegramm versenden
                             DEBUG.fine("KeepAlive-Telegramm wird versendet.");
                             _sendKeepAliveTel = false;
+                            _lastSendTimeAllTel = System.currentTimeMillis();
 
                             TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(0, TLSoIPFrame.TELTYPE_KEEPALIVE, null);
 
@@ -941,6 +944,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                                         _lastSendSeqNumDataTel = nextSendSeqNumDataTel;
                                         _countSendDataTel++;
                                         _lastSendTimeDataTel = System.currentTimeMillis();
+                                        _lastSendTimeAllTel  = System.currentTimeMillis();
 
                                         TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(nextSendSeqNumDataTel, TLSoIPFrame.TELTYPE_IB_V1, bytes);
 
@@ -1495,4 +1499,4 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 }
 
 
-//~Formatiert mit 'inovat Kodierkonvention' am 06.04.10
+//~Formatiert mit 'inovat Kodierkonvention' am 09.04.10
