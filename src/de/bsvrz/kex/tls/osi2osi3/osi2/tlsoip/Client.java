@@ -845,7 +845,11 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen.
-                                scheduleActionTimer(Client.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
+	                            if(_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel){
+		                            scheduleActionTimer(Client.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay);
+	                            } else{
+		                            scheduleActionTimer(Client.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
+	                            }
                             }
                         }
                     }
