@@ -810,7 +810,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen.
-                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE, _tlsoipCHelloDelay - durationSinceLastSendAllTel);
+                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_SEND, _tlsoipCHelloDelay - durationSinceLastSendAllTel);
                             }
                         }
                     }
@@ -857,7 +857,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             int durationSinceLastReceiptDataTel = (int) ((System.currentTimeMillis() - _lastReceiptTimeDataTel) / 1000L);
 
                             // Muss Quittierungs-Telegramm versendet werden ?
-                            if ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount)) {
+	                        if ((_lastReceiptSeqNumDataTel != _lastQuittSeqNumDataTel) && ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount))) {
 
                                 // Ja (erfolgt in handleAsyncSend()). Zusätzlich Timer für nächsten spätesten Versand setzten.
                                 _sendQuittTel = true;

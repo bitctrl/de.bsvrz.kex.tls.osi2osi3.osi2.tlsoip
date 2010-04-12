@@ -790,7 +790,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen.
-                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE, _tlsoipCHelloDelay - durationSinceLastSendAllTel);
+                                scheduleActionTimer(ActionType.KEEPALIVE_TIMER_SEND, _tlsoipCHelloDelay - durationSinceLastSendAllTel);
                             }
                         }
                     }
@@ -837,7 +837,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             int durationSinceLastReceiptDataTel = (int) ((System.currentTimeMillis() - _lastReceiptTimeDataTel) / 1000L);
 
                             // Muss Quittierungs-Telegramm versendet werden ?
-                            if ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount)) {
+                            if ((_lastReceiptSeqNumDataTel != _lastQuittSeqNumDataTel) && ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount))) {
 
                                 // Ja (erfolgt in handleAsyncSend()). Zusätzlich Timer für nächsten spätesten Versand setzten.
                                 _sendQuittTel = true;
@@ -880,7 +880,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             _sendQuittTel           = false;
                             _lastReceiptTimeDataTel = System.currentTimeMillis();  // Zeitüberwachung für Quittung zurücksetzen
                             _lastSendTimeAllTel     = System.currentTimeMillis();
-	                        _lastQuittSeqNumDataTel = _lastReceiptSeqNumDataTel;
+                            _lastQuittSeqNumDataTel = _lastReceiptSeqNumDataTel;
 
                             TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(_lastReceiptSeqNumDataTel, TLSoIPFrame.TELTYPE_QUITT, null);
 
