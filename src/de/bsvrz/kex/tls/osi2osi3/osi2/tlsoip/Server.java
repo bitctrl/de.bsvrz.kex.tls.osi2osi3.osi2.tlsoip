@@ -389,6 +389,9 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         /** Anzahl des gesendeten Daten-Telegramme seit des letzten Quittungstelegramm-Empfangs */
         private int _countSendDataTel;
 
+        /** Sequenznummer des letzten quittierten Daten-Telegramms */
+        private int _lastQuittSeqNumDataTel;
+
         /** Sequenznummer des letzten empfangenen Daten-Telegramms */
         private int _lastReceiptSeqNumDataTel;
 
@@ -667,6 +670,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                                 _lastReceiptTimeDataTel   = System.currentTimeMillis();
                                 _lastSendTimeDataTel      = System.currentTimeMillis();
                                 _lastReceiptSeqNumDataTel = 0xffff;  // Als nächstes wird die 0 erwartet
+                                _lastQuittSeqNumDataTel   = 0xffff;  // Erstes Telegramm hat die 0 und kann theoretisch auch quittiert werden.
                                 _lastSendSeqNumDataTel    = 0xffff;  // Als nächstes wird die 0 erwartet
                                 _countReceiptDataTel      = 0;
                                 _countSendDataTel         = 0;
@@ -887,15 +891,16 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             try {
                 do {
                     if (!_sendBuffer.hasRemaining()) {
-                        if (_sendQuittTel) {
+                        if (_sendQuittTel && (_lastReceiptSeqNumDataTel != _lastQuittSeqNumDataTel)) {
 
                             // Quittungstelegramm versenden
-                            DEBUG.fine(String.format("Quittungs-Telegramm wird versendet für SeqNum [%d]", _lastReceiptSeqNumDataTel));
-                            _countReceiptDataTel = 0;
-                            _sendKeepAliveTel    = false;
-                            _sendQuittTel        = false;
+                            DEBUG.fine(String.format("Quittungs-Telegramm wird versendet für SeqNum [%d], letzte Quittung war für SeqNum [%d]", _lastReceiptSeqNumDataTel, _lastQuittSeqNumDataTel));
+                            _countReceiptDataTel    = 0;
+                            _sendKeepAliveTel       = false;
+                            _sendQuittTel           = false;
                             _lastReceiptTimeDataTel = System.currentTimeMillis();  // Zeitüberwachung für Quittung zurücksetzen
                             _lastSendTimeAllTel     = System.currentTimeMillis();
+                            _lastQuittSeqNumDataTel = _lastReceiptSeqNumDataTel;
 
                             TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(_lastReceiptSeqNumDataTel, TLSoIPFrame.TELTYPE_QUITT, null);
 
@@ -908,7 +913,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
                             // KeepAlive-Telegramm versenden
                             DEBUG.fine("KeepAlive-Telegramm wird versendet.");
-                            _sendKeepAliveTel = false;
+                            _sendKeepAliveTel   = false;
                             _lastSendTimeAllTel = System.currentTimeMillis();
 
                             TLSoIPFrame tlsoIPFrame = new TLSoIPFrame(0, TLSoIPFrame.TELTYPE_KEEPALIVE, null);
@@ -1105,7 +1110,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                                             if (_countReceiptDataTel == _tlsoipCReceiptCount) {
 
                                                 // Wenn Anzahl der Datentelegramme, nach der Quittiert werden muss, erreicht ist, sofort Quittieren...
-                                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, 1);
+                                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, 0);
                                             } else {
 
                                                 // ...sonst spätenstens nach Ablauf der EmpfangDelays Quittieren
@@ -1499,4 +1504,4 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 }
 
 
-//~Formatiert mit 'inovat Kodierkonvention' am 09.04.10
+//~Formatiert mit 'inovat Kodierkonvention' am 12.04.10
