@@ -648,7 +648,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             _tlsoipCReceiptDelay   = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptDelay");
                             _tlsoipCReceiptTimeout = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptTimeout");
                             _serverSocketChannel   = ServerSocketChannel.open();
-                            _serverSocketChannel.configureBlocking(false);
+                            _serverSocketChannel.configureBlocking(true);
+                            // _serverSocketChannel.configureBlocking(false);
                             _serverSocketChannel.socket().bind(new InetSocketAddress(_tlsoipCAcceptPort));
                             DEBUG.info(String.format("Server aktzeptiert Verbindung auf Port %d; %s", _tlsoipCAcceptPort, this));
                         }
@@ -658,7 +659,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
                             if (_socketChannel != null) {
                                 final Socket socket = _socketChannel.socket();
-
+	                            
                                 _socketChannel.configureBlocking(false);
                                 _serverSocketChannel.close();
 
