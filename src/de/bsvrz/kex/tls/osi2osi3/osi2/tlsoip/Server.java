@@ -648,8 +648,19 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             _tlsoipCReceiptDelay   = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptDelay");
                             _tlsoipCReceiptTimeout = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptTimeout");
                             _serverSocketChannel   = ServerSocketChannel.open();
-                            _serverSocketChannel.configureBlocking(true);
-                            // _serverSocketChannel.configureBlocking(false);
+
+                            // ToDo ==============================================================================
+                            // ToDo ==============================================================================
+                            // ToDo ==============================================================================
+                            // ToDo Prüfen, wie der richtige BlockingMode ist und wie die Links aufgebaut werden
+                            // ToDo ==============================================================================
+                            // ToDo ==============================================================================
+                            // ToDo ==============================================================================
+                            _serverSocketChannel.configureBlocking(false);
+
+                            // _serverSocketChannel.configureBlocking(true);
+                            // ToDo ==============================================================================
+                            // ToDo ==============================================================================
                             _serverSocketChannel.socket().bind(new InetSocketAddress(_tlsoipCAcceptPort));
                             DEBUG.info(String.format("Server aktzeptiert Verbindung auf Port %d; %s", _tlsoipCAcceptPort, this));
                         }
@@ -659,7 +670,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
                             if (_socketChannel != null) {
                                 final Socket socket = _socketChannel.socket();
-	                            
+
                                 _socketChannel.configureBlocking(false);
                                 _serverSocketChannel.close();
 
@@ -1509,4 +1520,4 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 }
 
 
-//~Formatiert mit 'inovat Kodierkonvention' am 12.04.10
+//~Formatiert mit 'inovat Kodierkonvention' am 22.09.10
