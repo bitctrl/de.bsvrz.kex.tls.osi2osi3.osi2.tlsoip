@@ -912,6 +912,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             // Wenn tlsoip.C_ReceiptCount = 0, dann ist Quittierungsüberwachung beim Versand ausgeschaltet.
                             if ((_countSendDataTel >= _tlsoipCReceiptCount) && (_tlsoipCReceiptCount > 0)) {
                                 DEBUG.warning(String.format("Datenversand wegen fehlender Quittung angehalten. Versandte Datentelegramme %d >= Parameter tlsoip.C_ReceiptCount %d", _countSendDataTel, _tlsoipCReceiptCount));
+								// 1 Sekunde Warten
+	                            Thread.sleep(1000);
                             } else {
 
                                 // Prüfen, ob Daten zum Versand anliegen
