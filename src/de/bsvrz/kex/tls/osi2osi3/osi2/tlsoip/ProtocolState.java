@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 by inovat, innovative systeme - verkehr - tunnel - technik, Dipl.-Ing. H. C. Kniss
+ * Copyright (c) 2010-2011 by inovat, innovative systeme - verkehr - tunnel - technik, Dipl.-Ing. H. C. Kniss
  *
  * This file is part of de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip.ProtocolState
  *
@@ -20,7 +20,7 @@
  * Contact Information:
  * inovat, Dipl.-Ing. H. C. Kniss
  * Koelner Strasse 30
- * D-50859 Köln
+ * D-50859 Koeln
  * +49 (0)2234 4301 800
  * info@invat.de
  * www.inovat.de
