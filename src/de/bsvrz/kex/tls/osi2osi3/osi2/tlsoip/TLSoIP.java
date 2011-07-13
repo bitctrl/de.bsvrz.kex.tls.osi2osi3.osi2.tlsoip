@@ -46,7 +46,7 @@ import de.bsvrz.kex.tls.osi2osi3.osi2.api.AbstractDataLinkLayer;
 abstract class TLSoIP extends AbstractDataLinkLayer {
 
     /** Mamimale Anzahl von Nutzdatenbytes in einem OSI-2 Paket (Telegramm) */
-    final private int MAX_ANZAHL_NUTZDATENBYTES_PRO_OIS2_PAKET = 253;
+    final private int MAX_ANZAHL_NUTZDATENBYTES_PRO_OSI2_PAKET = 253;
 
     //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==============
 
@@ -73,7 +73,7 @@ abstract class TLSoIP extends AbstractDataLinkLayer {
      * @return Maximale Anzahl Nutzdatenbytes.
      */
     public int getMaximumDataSize() {
-        return MAX_ANZAHL_NUTZDATENBYTES_PRO_OIS2_PAKET;
+        return MAX_ANZAHL_NUTZDATENBYTES_PRO_OSI2_PAKET;
     }
 }
 

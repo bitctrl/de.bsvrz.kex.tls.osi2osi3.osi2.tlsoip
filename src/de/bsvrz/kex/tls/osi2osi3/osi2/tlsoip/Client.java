@@ -60,28 +60,28 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+//~ JDK IMPORTE ===============================================================
+
 //~ KLASSEN ===================================================================
 
 /**
  * Klasse, die als OSI-2 Protokollmodul für den Client-seitigen Teil einer TLSoIP-Verbindung eingesetzt werden kann.
- * <p>
- * Zur Verwendung dieses Protokollmoduls ist an dem jeweiligen Anschlusspunkt in der Konfiguration in
- * der Attributgruppe "atg.anschlussPunkt" im Attribut "ProtokollTyp" der Wert
- * "de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip.Client" einzutragen.
- * <p>
- * Im Parameter "atg.protokollEinstellungenStandard" des Anschlußpunkts können
- * die Standardwerte für alle Verbindungen an diesem Anschlußpunkt eingestellt.
- * <p>
- * Im Parameter "atg.protokollEinstellungenPrimary" der dem Anschlußpunkt
- * zugeordneten AnschlußPunktKommunikationsPartner können individuelle
- * Werte für die Verbindung zum jeweiligen Kommunikationspartner eingestellt werden.
- * <p>
- * Die Parameterdatensätze können dabei mehrere Einträge enthalten, die jeweils aus
- * einem Namen und einem Wert bestehen.
- * <p>
- * Folgende Einträge werden unterstützt (siehe auch TLS 2009, Teil 2,
- * Datenübertragung über TCP/IP (TLSoIP):
- * <p>
+ * <p/>
+ * Zur Verwendung dieses Protokollmoduls ist an dem jeweiligen Anschlusspunkt in der Konfiguration in der Attributgruppe
+ * "atg.anschlussPunkt" im Attribut "ProtokollTyp" der Wert "de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip.Client" einzutragen.
+ * <p/>
+ * Im Parameter "atg.protokollEinstellungenStandard" des Anschlußpunkts können die Standardwerte für alle Verbindungen
+ * an diesem Anschlußpunkt eingestellt.
+ * <p/>
+ * Im Parameter "atg.protokollEinstellungenPrimary" der dem Anschlußpunkt zugeordneten
+ * AnschlußPunktKommunikationsPartner können individuelle Werte für die Verbindung zum jeweiligen Kommunikationspartner
+ * eingestellt werden.
+ * <p/>
+ * Die Parameterdatensätze können dabei mehrere Einträge enthalten, die jeweils aus einem Namen und einem Wert
+ * bestehen.
+ * <p/>
+ * Folgende Einträge werden unterstützt (siehe auch TLS 2009, Teil 2, Datenübertragung über TCP/IP (TLSoIP):
+ * <p/>
  * Verbindungsparameter für beide Verbindungspartner:
  * <p>
  * <table cellpadding="2" cellspacing="2" border="1">
@@ -121,23 +121,26 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
     //~ FELDER ================================================================
 
-    /** Thread des Protokolls */
-    private final Thread _workThread;
-
     /** Runnable Objekt, das vom Protokollthread ausgeführt wird und den Protokollablauf steuert */
     final Client.Worker _worker = new Client.Worker();
-
-    /** Verbindung zum Datenverteiler */
-    ClientDavInterface _connection;
 
     /** Aktueller Zustand des Protokolls */
     private ProtocolState _protocolState = ProtocolState.CREATED;
 
+    /**
+     * Monitor Objekt, das zur Synchronisation des Protokoll-Threads und den API-Zugriffen von fremden Threads auf das
+     * Protokoll koordiniert
+     */
+    private final Object _protocolLock = new Object();
+
     /** Verbindungen zu Kommunikationspartnern, die durch das Protokoll verwaltet werden */
     private List<Link> _links = new LinkedList<Client.Link>();
 
-    /** Monitor Objekt, das zur Synchronisation des Protokoll-Threads und den API-Zugriffen von fremden Threads auf das Protokoll koordiniert */
-    private final Object _protocolLock = new Object();
+    /** Verbindung zum Datenverteiler */
+    ClientDavInterface _connection;
+
+    /** Thread des Protokolls */
+    private final Thread _workThread;
 
     //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==============
 
@@ -190,8 +193,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
     /**
      * Bestimmt, ob die Kommunikation dieses Protokolls bereits mit der Methode {@link #start} aktiviert wurde.
      *
-     * @return <code>true</code>, wenn die Kommunikation dieses Protokolls bereits aktiviert wurde,
-     *         sonst <code>false</code>.
+     * @return <code>true</code>, wenn die Kommunikation dieses Protokolls bereits aktiviert wurde, sonst
+     *         <code>false</code>.
      */
     public boolean isStarted() {
         synchronized (_protocolLock) {
@@ -202,10 +205,10 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
     //~ SET METHODEN ==========================================================
 
     /**
-     * Nimmmt die Verbindung zum Datenverteiler entgegen. Diese Methode wird vom OSI-3 Modul nach dem
-     * Erzeugen des OSI-2 Moduls durch den jeweiligen Konstruktor aufgerufen. Eine Implementierung
-     * eines Protokollmoduls kann sich bei Bedarf die übergebene Datenverteilerverbindung intern merken, um zu späteren
-     * Zeitpunkten auf die Datenverteiler-Applikationsfunktionen zuzugreifen.
+     * Nimmmt die Verbindung zum Datenverteiler entgegen. Diese Methode wird vom OSI-3 Modul nach dem Erzeugen des OSI-2
+     * Moduls durch den jeweiligen Konstruktor aufgerufen. Eine Implementierung eines Protokollmoduls kann sich bei
+     * Bedarf die übergebene Datenverteilerverbindung intern merken, um zu späteren Zeitpunkten auf die
+     * Datenverteiler-Applikationsfunktionen zuzugreifen.
      *
      * @param connection Verbindung zum Datenverteiler
      */
@@ -275,8 +278,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
     }
 
     /**
-     * Gibt Informationen des Protokolls für Debugzwecke zurück.
-     * Das genaue Format ist nicht festgelegt und kann sich ändern..
+     * Gibt Informationen des Protokolls für Debugzwecke zurück. Das genaue Format ist nicht festgelegt und kann sich
+     * ändern..
      *
      * @return Gibt Informationen des Protokolls für Debugzwecke zurück
      */
@@ -301,7 +304,10 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         /** Signalisiert dem Protokoll-Thread, das ein erneuter Verbindungsversuch durchgeführt werden soll */
         public static final Client.ActionType RETRY_CONNECT = new Client.ActionType("RETRY_CONNECT");
 
-        /** Signalisiert dem Protokoll-Thread, das die Kommunikation auf einer Verbindung mit Berücksichtigung von evtl. Parameteränderungen neu aufgebaut werden soll */
+        /**
+         * Signalisiert dem Protokoll-Thread, das die Kommunikation auf einer Verbindung mit Berücksichtigung von evtl.
+         * Parameteränderungen neu aufgebaut werden soll
+         */
         public static final Client.ActionType RELOAD_CALLED = new Client.ActionType("RELOAD_CALLED");
 
         /** Signalisiert dem Protokoll-Thread, das ein Quittierungs-Telegramm gesendet werden soll */
@@ -338,8 +344,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         //~ METHODEN ==========================================================
 
         /**
-         * Gibt Informationen des ActionType für Debugzwecke zurück.
-         * Das genaue Format ist nicht festgelegt und kann sich ändern..
+         * Gibt Informationen des ActionType für Debugzwecke zurück. Das genaue Format ist nicht festgelegt und kann
+         * sich ändern..
          *
          * @return Name der Aktion für Debugzwecke
          */
@@ -366,11 +372,26 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
     /** Realisiert ein Verbindungsobjekt, das die Kommunikation mit einem einzelnen Kommunikationspartner verwaltet. */
     private class Link extends AbstractDataLinkLayer.Link implements DataLinkLayer.Link, PropertyQueryInterface {
 
-        /** Wrapper-Objekt zum bequemen Zugriff auf die online änderbaren Parameter dieser Verbindung */
-        private final PropertyConsultant _propertyConsultant;
+        /** Aktuell asynchron zu sendendes Telegramm */
+        byte[] _packetOnTheAir = null;
 
-        /** Priorisierte Queue mit den noch zu versendenden Telegrammen */
-        private final PriorityChannel _sendChannel;
+        /** Enthält die online änderbaren Parameter für diese Verbindung */
+        private Properties _properties = null;
+
+        /** IP-Adresse des Servers */
+        private String _tlsoipCServerAdrA = null;
+
+        /** Timerobjekt mit dem zukünftige Aktionen geplant und ausgeführt werden */
+        private final Timer _timer = new Timer(true);
+
+        /** Internes Flag für die Verwaltung des Initialen Telegramms. */
+        private boolean _tcpConnectedWaitingForFirstReceive = false;
+
+        /** Sendepuffer für versendete Telegramme */
+        private final ByteBuffer _sendBuffer = ByteBuffer.allocateDirect(28 + getMaximumDataSize());
+
+        /** Empfangspuffer für empfangene Telegramme */
+        private final ByteBuffer _readBuffer = ByteBuffer.allocateDirect(3000);
 
         /** Anzahl der empfangenen Daten-Telegramme seit des letzten Quittungstelegramm-Versands */
         private int _countReceiptDataTel;
@@ -399,6 +420,12 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         /** Zeitpunkt des letzten gesendeten Daten-Telegramms in Millisekunden */
         private long _lastSendTimeDataTel;
 
+        /** Wrapper-Objekt zum bequemen Zugriff auf die online änderbaren Parameter dieser Verbindung */
+        private final PropertyConsultant _propertyConsultant;
+
+        /** Priorisierte Queue mit den noch zu versendenden Telegrammen */
+        private final PriorityChannel _sendChannel;
+
         /** Flag das signalisiert, dass ein Keep-Alive-Telegramm versendet werden soll */
         private boolean _sendKeepAliveTel;
 
@@ -406,58 +433,61 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         private boolean _sendQuittTel;
 
         /**
-         * Enthält während einer bestehenden Verbindung das Kommunikationsobjekt mit internem Server,
-         * über den der Datenaustausch mit dem Client abgewickelt wird; sonst <code>null</code>.
+         * Enthält während einer bestehenden Verbindung das Kommunikationsobjekt mit internem Server, über den der
+         * Datenaustausch mit dem Client abgewickelt wird; sonst <code>null</code>.
          */
         private SocketChannel _socketChannel;
 
         /** Portnummer des Servers */
         private int _tlsoipCAcceptPortA;
 
-        /** Zeit [s], nach der ein Keep-Alive-Telegramm an die Gegenstelle versendet werden muss (0=ausgeschaltet für Testzwecke, 1...3599) */
+        /**
+         * Zeit [s], nach der ein Keep-Alive-Telegramm an die Gegenstelle versendet werden muss (0=ausgeschaltet für
+         * Testzwecke, 1...3599)
+         */
         private int _tlsoipCHelloDelay;
 
-        /** Zeit [s], nach der spätestens ein Keep-Alive-Telegramm der Gegenstelle erwartet wird ( > C_HelloDelay der Gegenstelle), (0=ausgeschaltet für Testzwecke, 1...3600) */
+        /**
+         * Zeit [s], nach der spätestens ein Keep-Alive-Telegramm der Gegenstelle erwartet wird ( > C_HelloDelay der
+         * Gegenstelle), (0=ausgeschaltet für Testzwecke, 1...3600)
+         */
         private int _tlsoipCHelloTimeout;
 
-        /** Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein Quittungstelegramm versendet werden muss/erwartet wird (1..255) */
+        /**
+         * Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein Quittungstelegramm versendet werden
+         * muss/erwartet wird (1..255)
+         */
         private int _tlsoipCReceiptCount;
 
-        /** Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die Gegenstelle versendet werden muss (1..59) */
+        /**
+         * Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die Gegenstelle
+         * versendet werden muss (1..59)
+         */
         private int _tlsoipCReceiptDelay;
 
-        /** Zeit [s], nach der spätestens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der Gegenstelle) (1..60) */
+        /**
+         * Zeit [s], nach der spätestens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der
+         * Gegenstelle) (1..60)
+         */
         private int _tlsoipCReceiptTimeout;
 
-        /** Zeit [s], nach der bei Nichtbestehen einer Verbindung spätestens ein neuer Verbindungsaufbau initiiert werden muss  (0=sofort, 1...3600). */
+        /**
+         * Zeit [s], nach der bei Nichtbestehen einer Verbindung spätestens ein neuer Verbindungsaufbau initiiert werden
+         * muss  (0=sofort, 1...3600).
+         */
         private int _tlsoipCReconnectDelay;
 
         /**
-         * Wenn <code>true</code>, dann wartet das Protokoll nach dem Aufbau der TCP-Verbindung auf
-         * den Empfang eines initialenTelegramms, bevor eine Verbindung als "lebt" gemeldet wird.
+         * Wenn <code>true</code>, dann wartet das Protokoll nach dem Aufbau der TCP-Verbindung auf den Empfang eines
+         * initialenTelegramms, bevor eine Verbindung als "lebt" gemeldet wird.
          */
         private boolean _tlsoipWaitForInitialReceive;
 
-        /** Aktuell asynchron zu sendendes Telegramm */
-        byte[] _packetOnTheAir = null;
-
-        /** Enthält die online änderbaren Parameter für diese Verbindung */
-        private Properties _properties = null;
-
-        /** IP-Adresse des Servers */
-        private String _tlsoipCServerAdrA = null;
-
-        /** Internes Flag für die Verwaltung des Initialen Telegramms. */
-        private boolean _tcpConnectedWaitingForFirstReceive = false;
-
-        /** Timerobjekt mit dem zukünftige Aktionen geplant und ausgeführt werden */
-        private final Timer _timer = new Timer(true);
-
-        /** Sendepuffer für versendete Telegramme */
-        private final ByteBuffer _sendBuffer = ByteBuffer.allocateDirect(28 + getMaximumDataSize());
-
-        /** Empfangspuffer für empfangene Telegramme */
-        private final ByteBuffer _readBuffer = ByteBuffer.allocateDirect(3000);
+        /**
+         * ToDO: Flag das signalisiert, dass Debugmeldung wegen fehlender Quittung der Gegenseite einmal ausgegeben werden
+         * soll
+         */
+        private boolean _warnungFehlendeQuittungAusgeben;
 
         //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==========
 
@@ -517,15 +547,16 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         }
 
         /**
-         * Schließt den Kommunikationskanal zum Server und plant den erneuten Aufbau der Kommunikationsverbindung
-         * nach der durch den Parameter "tlsoip.C_ReconnectDelay" parameterierbaren Wartezeit ein.
+         * Schließt den Kommunikationskanal zum Server und plant den erneuten Aufbau der Kommunikationsverbindung nach
+         * der durch den Parameter "tlsoip.C_ReconnectDelay" parameterierbaren Wartezeit ein.
          */
         private void closeChannel() {
             closeChannel(_tlsoipCReconnectDelay);
         }
 
         /**
-         * Schließt den Kommunikationskanal zum Server und plant den erneuten Aufbau der Kommunikationsverbindung nach einer vorgebbaren Wartezeit ein.
+         * Schließt den Kommunikationskanal zum Server und plant den erneuten Aufbau der Kommunikationsverbindung nach
+         * einer vorgebbaren Wartezeit ein.
          *
          * @param reconnectDelay Wartezeit nach der die Verbindung wieder aufgebaut werden soll.
          */
@@ -655,6 +686,10 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
                             scheduleActionTimer(ActionType.KEEPALIVE_TIMER_RECEIVE, _tlsoipCHelloTimeout);
                             scheduleActionTimer(ActionType.KEEPALIVE_TIMER_SEND, _tlsoipCHelloDelay);
+
+                            // ToDo Anfang ========================================================================
+                            // ToDo scheduleActionTimer(ActionType.QUITT_TIMER_RECEIVE, _tlsoipCReceiptTimeout);
+                            // ToDo Ende ==========================================================================
                         } else {
                             DEBUG.info(String.format("Verbindungsaufbau ist noch nicht abgeschlossen und wird asynchron durchgeführt; %s", this));
                             _socketChannel.register(selector, SelectionKey.OP_CONNECT, this);
@@ -684,7 +719,9 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 
         /**
          * Ermittelt auf Basis der aktullen SeqNum des Daten-Telegramm die nächste folgende Nummer.
+         *
          * @param num Aktuelle SeqNum des Daten Telegramms
+         *
          * @return Nächste Nummer (num = num+1), wobei bei num = 65535 die nächste Nummer 0 ist.
          */
         public int getNextSeqNum(int num) {
@@ -713,7 +750,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         //~ METHODEN ==========================================================
 
         /**
-         * Führt eine Aktion für dieses Verbindungsobjekt aus. Diese Methode wird vom Protokoll-Thread zur Verarbeitung einer Aktion aufgerufen.
+         * Führt eine Aktion für dieses Verbindungsobjekt aus. Diese Methode wird vom Protokoll-Thread zur Verarbeitung
+         * einer Aktion aufgerufen.
          *
          * @param action   Auszuführende Aktion
          * @param selector Selektor des Protokoll-Threads zum asynchronen Zugriff auf die Kommunikationskanäle.
@@ -840,11 +878,11 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen.
-	                            if(_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel){
-		                            scheduleActionTimer(Client.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay);
-	                            } else{
-		                            scheduleActionTimer(Client.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
-	                            }
+                                if (_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) {
+                                    scheduleActionTimer(Client.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay);
+                                } else {
+                                    scheduleActionTimer(Client.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
+                                }
                             }
                         }
                     }
@@ -906,10 +944,25 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             // Prüfen, ob überhaupt noch weitere Datentelegramme versand werden dürfen
                             // Wenn tlsoip.C_ReceiptCount = 0, dann ist Quittierungsüberwachung beim Versand ausgeschaltet.
                             if ((_countSendDataTel >= _tlsoipCReceiptCount) && (_tlsoipCReceiptCount > 0)) {
-                                DEBUG.warning(String.format("Datenversand wegen fehlender Quittung angehalten. Versandte Datentelegramme %d >= Parameter tlsoip.C_ReceiptCount %d", _countSendDataTel, _tlsoipCReceiptCount));
-								// 1 Sekunde Warten
-	                            Thread.sleep(1000);
+
+                                // ToDo Anfang ========================================================================
+                                if (_warnungFehlendeQuittungAusgeben) {
+                                    DEBUG.warning(String.format("Datenversand wegen fehlender Quittung angehalten. Versandte Datentelegramme %d >= Parameter tlsoip.C_ReceiptCount %d", _countSendDataTel, _tlsoipCReceiptCount));
+
+                                    // 1 Sekunde Warten
+                                    Thread.sleep(1000);
+                                    _warnungFehlendeQuittungAusgeben = false;
+                                }
+
+                                // Eigentlich überflüssig !!?!!
+                                // ToDo scheduleActionTimer(ActionType.QUITT_TIMER_RECEIVE, _tlsoipCReceiptTimeout);
+                                // ToDo Ende ==========================================================================
                             } else {
+
+                                // ToDo Anfang ========================================================================
+                                _warnungFehlendeQuittungAusgeben = true;
+
+                                // ToDo Ende ==========================================================================
 
                                 // Prüfen, ob Daten zum Versand anliegen
                                 PriorizedByteArray priorizedByteArray = (Client.PriorizedByteArray) _sendChannel.poll(0L);
@@ -978,7 +1031,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         }
 
         /**
-         * Verarbeitet asynchrone Kommunikationsoperationen anhand der vom Selektor des Protokoll-Threads gelieferten Möglichkeiten
+         * Verarbeitet asynchrone Kommunikationsoperationen anhand der vom Selektor des Protokoll-Threads gelieferten
+         * Möglichkeiten
          *
          * @param selectionKey Vom Selektor des Protokoll-Threads gelieferte Kommunikationsmöglichkeiten
          * @param selector     Selektor des Protokoll-Threads zum asynchronen Zugriff auf die Kommunikationskanäle.
@@ -1147,7 +1201,10 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             _worker.notify(this, action);
         }
 
-        /** Initiiert den Abbruch und erneuten Verbindungsaufbau einer bestehenden Verbindung mit evtl. geänderten Parametern */
+        /**
+         * Initiiert den Abbruch und erneuten Verbindungsaufbau einer bestehenden Verbindung mit evtl. geänderten
+         * Parametern
+         */
         public void reload() {
             DEBUG.fine(String.format("reload %s", this));
 
@@ -1245,8 +1302,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
     private static class PriorizedByteArray implements PriorizedObject {
 
         /**
-         * Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass keine weiteren Telegramme mehr versendet werden
-         * sollen.
+         * Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass
+         * keine weiteren Telegramme mehr versendet werden sollen.
          */
         private final byte[] _bytes;
 
@@ -1258,8 +1315,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         /**
          * Erzeugt ein neues Objekt mit den angegebenen Eigenschaften.
          *
-         * @param bytes    Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass keine weiteren Telegramme mehr
-         *                 versendet werden sollen.
+         * @param bytes    Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code>
+         *                 signalisiert, dass keine weiteren Telegramme mehr versendet werden sollen.
          * @param priority Priorität des zu versendenden Telegramms. Kleinere Werte haben höhere Priorität.
          */
         public PriorizedByteArray(byte[] bytes, int priority) {
@@ -1270,8 +1327,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         //~ GET METHODEN ======================================================
 
         /**
-         * @return Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass keine weiteren Telegramme mehr
-         *         versendet werden sollen.
+         * @return Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code>
+         *         signalisiert, dass keine weiteren Telegramme mehr versendet werden sollen.
          */
         public byte[] getBytes() {
             return _bytes;
@@ -1284,12 +1341,15 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
     }
 
 
-    /** Klasse die das Runnable-Interface implementiert, vom Protokollthread ausgeführt wird und den Protokollablauf steuert */
+    /**
+     * Klasse die das Runnable-Interface implementiert, vom Protokollthread ausgeführt wird und den Protokollablauf
+     * steuert
+     */
     private class Worker implements Runnable {
 
         /**
-         * Selektor-Objekt, mit dessen Hilfe alle Kommunikationsoperationen (Verbindungsaufbau, Versand und
-         * Empfang von Daten) ohne zusätzliche Threads asynchron ausgeführt werden.
+         * Selektor-Objekt, mit dessen Hilfe alle Kommunikationsoperationen (Verbindungsaufbau, Versand und Empfang von
+         * Daten) ohne zusätzliche Threads asynchron ausgeführt werden.
          */
         private final Selector _selector;
 
@@ -1311,8 +1371,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         //~ METHODEN ==========================================================
 
         /**
-         * Kann von einem beliebigen Thread aufgerufen werden, um dem Protokoll-Thread zu signalisieren,
-         * dass eine bestimmte Aktion ausgeführt werden soll.
+         * Kann von einem beliebigen Thread aufgerufen werden, um dem Protokoll-Thread zu signalisieren, dass eine
+         * bestimmte Aktion ausgeführt werden soll.
          *
          * @param link   Verbindung, auf die sich die Aktion bezieht.
          * @param action Durchzuführende Aktion
@@ -1426,8 +1486,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         }
 
         /**
-         * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke.
-         * Das genaue Format ist nicht festgelegt und kann sich ändern..
+         * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke. Das genaue Format ist nicht festgelegt und kann
+         * sich ändern..
          *
          * @return Informationen dieses Objekts für Debug-Zwecke
          */
@@ -1438,8 +1498,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         //~ INNERE KLASSEN ====================================================
 
         /**
-         * Hilfsklasse, die zur Speicherung einer Aktion zusammen mit der Verbindung,
-         * auf die sich die Aktion bezieht, eingesetzt wird.
+         * Hilfsklasse, die zur Speicherung einer Aktion zusammen mit der Verbindung, auf die sich die Aktion bezieht,
+         * eingesetzt wird.
          */
         class WorkAction {
 
@@ -1465,8 +1525,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
             //~ METHODEN ======================================================
 
             /**
-             * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke.
-             * Das genaue Format ist nicht festgelegt und kann sich ändern..
+             * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke. Das genaue Format ist nicht festgelegt und
+             * kann sich ändern..
              *
              * @return Informationen dieses Objekts für Debug-Zwecke
              */
@@ -1478,4 +1538,5 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
 }
 
 
-//~Formatiert mit 'inovat Kodierkonvention' am 12.04.10
+
+//~Formatiert mit 'inovat Kodierkonvention' am 07/13/11
