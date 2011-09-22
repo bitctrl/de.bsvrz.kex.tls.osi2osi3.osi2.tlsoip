@@ -150,6 +150,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
      */
     public Server() throws IOException {
         DEBUG.fine("TLSoIP-Server (Konstruktoraufruf)");
+
         _workThread = new Thread(_worker, "TLSoIP.Server.Worker");
     }
 
@@ -1384,7 +1385,9 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             DEBUG.fine("TSLoIP: 30 Sekunden warten: " + toString());
 
             try {
-                Thread.sleep(30000);
+	            // ToDo: Testweise für NI 5 Minuten warten
+	            // Thread.sleep(30000);
+	            Thread.sleep(30000*2*5);
             }
             catch (InterruptedException e) {
 
