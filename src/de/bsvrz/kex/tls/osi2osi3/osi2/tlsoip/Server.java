@@ -59,6 +59,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -217,8 +218,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
     /**
      * Nimmmt die Verbindung zum Datenverteiler entgegen. Diese Methode wird vom OSI-3 Modul nach dem Erzeugen des OSI-2
-     * Moduls durch den jeweiligen Konstruktor aufgerufen. Eine Implementierung eines Protokollmoduls kann sich bei
-     * Bedarf die übergebene Datenverteilerverbindung intern merken, um zu späteren Zeitpunkten auf die
+     * Moduls durch den jeweiligen Konstruktor aufgerufen. Eine Implementierung eines Protokollmoduls kann sich bei Bedarf
+     * die übergebene Datenverteilerverbindung intern merken, um zu späteren Zeitpunkten auf die
      * Datenverteiler-Applikationsfunktionen zuzugreifen.
      *
      * @param connection Verbindung zum Datenverteiler
@@ -355,8 +356,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         //~ METHODEN ==========================================================
 
         /**
-         * Gibt Informationen des ActionType für Debugzwecke zurück. Das genaue Format ist nicht festgelegt und kann
-         * sich ändern..
+         * Gibt Informationen des ActionType für Debugzwecke zurück. Das genaue Format ist nicht festgelegt und kann sich
+         * ändern..
          *
          * @return Name der Aktion für Debugzwecke
          */
@@ -423,8 +424,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         private boolean _sendQuittTel;
 
         /**
-         * Enthält während des Verbindungsaufbau das Kommunikationsobjekt mit internem Serversocket, über den die
-         * Verbindung des Clients entgegengenommen wird; sonst <code>null</code>.
+         * Enthält während des Verbindungsaufbau das Kommunikationsobjekt mit internem Serversocket, über den die Verbindung
+         * des Clients entgegengenommen wird; sonst <code>null</code>.
          */
         private ServerSocketChannel _serverSocketChannel;
 
@@ -435,8 +436,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         private SocketChannel _socketChannel;
 
         /**
-         * Serverport, auf dem Anfragen entgegengenommen werden. Dynamische und oder Private Ports (49152 bis 65535)
-         * gemäß IANA konfigurierbar
+         * Serverport, auf dem Anfragen entgegengenommen werden. Dynamische und oder Private Ports (49152 bis 65535) gemäß
+         * IANA konfigurierbar
          */
         private int _tlsoipCAcceptPort;
 
@@ -453,14 +454,14 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         private int _tlsoipCHelloTimeout;
 
         /**
-         * Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein Quittungstelegramm versendet werden
-         * muss/erwartet wird (1..255)
+         * Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein Quittungstelegramm versendet werden muss/erwartet
+         * wird (1..255)
          */
         private int _tlsoipCReceiptCount;
 
         /**
-         * Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die Gegenstelle
-         * versendet werden muss (1..59)
+         * Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die Gegenstelle versendet
+         * werden muss (1..59)
          */
         private int _tlsoipCReceiptDelay;
 
@@ -539,7 +540,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                 throw new RuntimeException(e);
             }
 
-            notifyWorker(Server.ActionType.ABORT_CALLED);
+            notifyWorker(Server.ActionType.ABORT_CALLED, 0, false);
         }
 
         /** Schließt den Kommunikationskanal zum Client und wartet auf neuen Verbindungsaufbau seitens des Client. */
@@ -548,8 +549,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         }
 
         /**
-         * Schließt den Kommunikationskanal zum Client und plant den erneuten Aufbau der Kommunikationsverbindung nach
-         * einer vorgebbaren Wartezeit ein.
+         * Schließt den Kommunikationskanal zum Client und plant den erneuten Aufbau der Kommunikationsverbindung nach einer
+         * vorgebbaren Wartezeit ein.
          *
          * @param reconnectDelay Wartezeit nach der die Verbindung wieder aufgebaut werden soll.
          */
@@ -562,7 +563,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                         _serverSocketChannel.close();
                     }
                     catch (IOException e) {
-                        DEBUG.warning("Fehler beim Schließen des ServerSocketChannels: " + e);
+                        DEBUG.warning("Fehler beim Schließen des ServerSocketChannels: ", e);
                     }
                     finally {
 
@@ -624,14 +625,14 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                 _protocolLock.notifyAll();
             }
 
-            notifyWorker(Server.ActionType.CONNECT_CALLED);
+            // ToDo freigeben nach Test: Geändert inovat auf Server
+            notifyWorker(Server.ActionType.CONNECT_CALLED, 0, false);
         }
 
         /**
          * Asynchroner Verbindungsaufbau. Zum Aufbau der Kommunikationsverbindung wird ein Kommunikationskanal mit einem
-         * Serversocket initialisiert, der auf dem gewünschten TCP-Port Verbindungen entgegennimmt. Nachdem
-         * Verbindungsaufbau wird der Serversocket wieder geschlossen und ein neuer Kommunikationskanal für den
-         * Datenaustausch initialisiert.
+         * Serversocket initialisiert, der auf dem gewünschten TCP-Port Verbindungen entgegennimmt. Nachdem Verbindungsaufbau
+         * wird der Serversocket wieder geschlossen und ein neuer Kommunikationskanal für den Datenaustausch initialisiert.
          *
          * @param selector Selektor des Protokoll-Threads zum asynchronen Zugriff auf die Kommunikationskanäle.
          */
@@ -655,18 +656,9 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             _tlsoipCReceiptTimeout = _propertyConsultant.getIntProperty("tlsoip.C_ReceiptTimeout");
                             _serverSocketChannel   = ServerSocketChannel.open();
 
-                            // ToDo ==============================================================================
-                            // ToDo ==============================================================================
-                            // ToDo ==============================================================================
                             // ToDo Prüfen, wie der richtige BlockingMode ist und wie die Links aufgebaut werden
-                            // ToDo ==============================================================================
-                            // ToDo ==============================================================================
-                            // ToDo ==============================================================================
-                            _serverSocketChannel.configureBlocking(false);
-
                             // _serverSocketChannel.configureBlocking(true);
-                            // ToDo ==============================================================================
-                            // ToDo ==============================================================================
+                            _serverSocketChannel.configureBlocking(false);
                             _serverSocketChannel.socket().bind(new InetSocketAddress(_tlsoipCAcceptPort));
                             DEBUG.info(String.format("Server aktzeptiert Verbindung auf Port %d; %s", _tlsoipCAcceptPort, this));
                         }
@@ -694,7 +686,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                                 _countSendDataTel         = 0;
                                 _sendKeepAliveTel         = true;
                                 _sendQuittTel             = false;
-                                DEBUG.info("Verbindungsaufbau von " + socket.getInetAddress().getHostName() + " akzeptiert; " + this);
+                                DEBUG.info(String.format("Verbindungsaufbau von %s akzeptiert; %s", socket.getInetAddress().getHostName(), this));
 
                                 // Kanal zum Lesen registrieren
                                 _socketChannel.register(selector, SelectionKey.OP_READ, this);
@@ -755,17 +747,21 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         //~ METHODEN ==========================================================
 
         /**
-         * Führt eine Aktion für dieses Verbindungsobjekt aus. Diese Methode wird vom Protokoll-Thread zur Verarbeitung
-         * einer Aktion aufgerufen.
+         * Führt eine Aktion für dieses Verbindungsobjekt aus. Diese Methode wird vom Protokoll-Thread zur Verarbeitung einer
+         * Aktion aufgerufen.
          *
-         * @param action   Auszuführende Aktion
-         * @param selector Selektor des Protokoll-Threads zum asynchronen Zugriff auf die Kommunikationskanäle.
+         * @param action           Auszuführende Aktion
+         * @param selector         Selektor des Protokoll-Threads zum asynchronen Zugriff auf die Kommunikationskanäle.
+         * @param seqNum           SequenzNummer des Telegramms, welches quittiert werden soll
+         * @param sofortQuittieren <code>true</code>, wenn Quittierung in jedem Fall sofort erfolgen soll, sonst
          */
-        public void handleAction(Server.ActionType action, Selector selector) {
+
+        // ToDo freigeben nach Test: Geändert inovat auf Server
+        public void handleAction(Server.ActionType action, Selector selector, int seqNum, boolean sofortQuittieren) {
             DEBUG.finer(String.format("handleAction(%s): %s", action, this));
 
             if ((action == Server.ActionType.CONNECT_CALLED) || (action == Server.ActionType.RETRY_CONNECT)) {
-                DEBUG.fine("Verbindung aufbauen");
+                DEBUG.fine(String.format("--> %s %s Verbindung aufbauen", this, new Date().toString()));
                 connectSocketChannel(selector);
             } else if (action == Server.ActionType.SEND_CALLED) {
 
@@ -794,7 +790,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             if (_tlsoipCHelloTimeout < durationSinceLastReceiptAllTel) {
 
                                 // Ja. Verbindung abbrechen und nach Wartezeit neu aufbauen.
-                                DEBUG.warning(String.format("Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes KeepAlive vor %ds > Parameter tlsoip.C_HelloTimeout %d", durationSinceLastReceiptAllTel, _tlsoipCHelloTimeout));
+                                DEBUG.warning(String.format("--> %s %s Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes KeepAlive vor %ds > Parameter tlsoip.C_HelloTimeout %d", this, new Date().toString(), durationSinceLastReceiptAllTel, _tlsoipCHelloTimeout));
                                 closeChannel();
                             } else {
 
@@ -865,33 +861,51 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                 synchronized (_linkLock) {
                     if (_linkState == LinkState.CONNECTED) {
 
-                        // Prüfen, ob Quittungs-Überwachung für das Senden nicht ausgeschaltet ist (zu Testzwecken)
-                        if (_tlsoipCReceiptDelay == 0) {
-                            DEBUG.info("Quittierungs-Überwachung für empfangene Daten-Telegramme ist ausgeschaltet (tlsoip.C_ReceiptDelay = 0)");
-                            _sendQuittTel = false;
-                        } else {
+                        // ToDo freigeben nach Test: ###Start: Geändert inoat auf Server
+                        boolean actionBearbeiten = true;
 
-                            // Zeitraum [s], seit letztes Daten-Telegramm empfangen wurde
-                            int durationSinceLastReceiptDataTel = (int) ((System.currentTimeMillis() - _lastReceiptTimeDataTel) / 1000L);
+                        if (seqNum != _lastReceiptSeqNumDataTel) {  // Actions für nicht mehr aktuelle Sequenz-Nummern nicht bearbeiten
+                            actionBearbeiten = false;
+                        }
 
-                            // Muss Quittierungs-Telegramm versendet werden ?
-                            if ((_lastReceiptSeqNumDataTel != _lastQuittSeqNumDataTel) && ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount))) {
+                        if (sofortQuittieren) {                     // sofortige Quittierung unbedingt bearbeiten
+                            actionBearbeiten = true;
+                        }
 
-                                // Ja (erfolgt in handleAsyncSend()). Zusätzlich Timer für nächsten spätesten Versand setzten.
-                                _sendQuittTel = true;
-                                scheduleActionTimer(Server.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay);
+                        if (actionBearbeiten) {
+
+                            // Prüfen, ob Quittungs-Überwachung für das Senden nicht ausgeschaltet ist (zu Testzwecken)
+                            if (_tlsoipCReceiptDelay == 0) {
+                                DEBUG.info("Quittierungs-Überwachung für empfangene Daten-Telegramme ist ausgeschaltet (tlsoip.C_ReceiptDelay = 0)");
+                                _sendQuittTel = false;
                             } else {
 
-                                // Nein, aber bald. Timer neu setzen.
-                                if (_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) {
-                                    scheduleActionTimer(Server.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay);
+                                // Zeitraum [s], seit letztes Daten-Telegramm empfangen wurde
+                                int durationSinceLastReceiptDataTel = (int) ((System.currentTimeMillis() - _lastReceiptTimeDataTel) / 1000L);
+
+                                // Muss Quittierungs-Telegramm versendet werden ?
+                                if ((_lastReceiptSeqNumDataTel != _lastQuittSeqNumDataTel) && ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount) || (sofortQuittieren))) {
+
+                                    // Ja (erfolgt in handleAsyncSend()).
+                                    _sendQuittTel = true;
+
+                                    // ToDo Prüfen ob notwendig: Zusätzlich Timer für nächsten spätesten Versand setzten.
+                                    scheduleActionTimer(Server.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay, seqNum);
                                 } else {
-                                    scheduleActionTimer(Server.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel);
+
+                                    // Nein, aber bald. Timer neu setzen.
+                                    if (_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) {
+                                        scheduleActionTimer(Server.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay, seqNum);
+                                    } else {
+                                        scheduleActionTimer(Server.ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay - durationSinceLastReceiptDataTel, seqNum);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                // ToDo freigeben nach Test: ###Ende: Geändert inovat auf Server
             } else {
                 DEBUG.warning(String.format("Unbekannter ActionType: %s", action));
             }
@@ -929,6 +943,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             _sendBuffer.clear();
                             _sendBuffer.put(tlsoIPFrame.getTel());
                             _sendBuffer.flip();
+                            DEBUG.fine(String.format("--> %s %s Quittierungs-Telegramm versendet %d", this, new Date().toString(), _lastReceiptSeqNumDataTel));
                         } else if (_sendKeepAliveTel) {
 
                             // KeepAlive-Telegramm versenden
@@ -941,6 +956,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             _sendBuffer.clear();
                             _sendBuffer.put(tlsoIPFrame.getTel());
                             _sendBuffer.flip();
+                            DEBUG.fine(String.format("--> %s %s KeepAlive-Telegramm versendet", this, new Date().toString()));
                         } else {
 
                             // Daten-Telegramm versenden
@@ -948,6 +964,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             // Wenn tlsoip.C_ReceiptCount = 0, dann ist Quittierungsüberwachung beim Versand ausgeschaltet.
                             if ((_countSendDataTel >= _tlsoipCReceiptCount) && (_tlsoipCReceiptCount > 0)) {
                                 DEBUG.warning(String.format("Datenversand wegen fehlender Quittung angehalten. Versandte Datentelegramme %d >= Parameter tlsoip.C_ReceiptCount %d", _countSendDataTel, _tlsoipCReceiptCount));
+
+                                break;  // Schleife unbedingt verlassen, damit z. B. Quittungstelegramme berhaupt empfangen werden knnen.
                             } else {
 
                                 // Prüfen, ob Daten zum Versand anliegen
@@ -976,6 +994,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                                         _sendBuffer.clear();
                                         _sendBuffer.put(tlsoIPFrame.getTel());
                                         _sendBuffer.flip();
+                                        DEBUG.fine(String.format("--> %s %s Datentelegramm gesendet %d", this, new Date().toString(), tlsoIPFrame.getSeqNum()));
                                     }
                                 }
                             }
@@ -1047,7 +1066,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                     int count = _socketChannel.read(_readBuffer);
 
                     if (count == -1) {
-                        DEBUG.info(String.format("Verbindung wurde von der Gegenseite terminiert; %s", this));
+                        DEBUG.info(String.format("--> %s %s Verbindung wurde von der Gegenseite terminiert", this, new Date().toString()));
                         closeChannel();
                     } else {
                         DEBUG.finest(String.format("Anzahl gelesener Bytes: %d", count));
@@ -1075,6 +1094,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
                                 // Quittungs-Telegramm prüfen und entsprechende Quittungs-Zustände setzten
                                 if (tlSoIPFrame.isQuittTel()) {
+                                    DEBUG.fine(String.format("--> %s %s Quittungs-Telegramm empfangen %d", this, new Date().toString(), tlSoIPFrame.getSeqNum()));
 
                                     // Zeitpunkt der letzten Quittierung setzen (wird einfach als letztes gesendetes Datentelegramm gewertet für die Zeitüberwachung)
                                     _lastSendTimeDataTel = System.currentTimeMillis();
@@ -1093,7 +1113,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                                     // Nichts tun: Beim Verbindungsaufbau werden die KeepAliveTimer gesetzt und nei Zeiten aufgerufen.
                                     // Beim Aufruf wird entschieden, ob KeepAlive-Empfangs-Telegramm notwendig gewesen wäre und
                                     // ggf. der nächste späteste Zeitpunkt registriert.
-                                    DEBUG.finer("KeepAlive-Telegramm empfangen");
+                                    DEBUG.finer(String.format("--> %s %s KeepAlive-Telegramm empfangen", this, new Date().toString()));
                                 }
 
                                 // Datentelegramm empfangen
@@ -1120,6 +1140,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
                                             // Neue Nummer als letzte Nummer merken
                                             _lastReceiptSeqNumDataTel = tlSoIPFrame.getSeqNum();
+                                            DEBUG.fine(String.format("--> %s %s Datentelegramm empfangen %d", this, new Date().toString(), tlSoIPFrame.getSeqNum()));
 
                                             // Zeit für letztes empfangenes Daten-Telegramm setzten (erst hier, weil jetzt als gültig akzeptiert)
                                             _lastReceiptTimeDataTel = System.currentTimeMillis();
@@ -1130,11 +1151,13 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                                             if (_countReceiptDataTel == _tlsoipCReceiptCount) {
 
                                                 // Wenn Anzahl der Datentelegramme, nach der Quittiert werden muss, erreicht ist, sofort Quittieren...
-                                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, 0);
+                                                // ToDo freigeben nach Test: Geändert inovat auf Server
+                                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, 0, _lastReceiptSeqNumDataTel, true);
                                             } else {
 
                                                 // ...sonst spätenstens nach Ablauf der EmpfangDelays Quittieren
-                                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay);
+                                                // ToDo freigeben nach Test: Geändert inovat auf Server
+                                                scheduleActionTimer(ActionType.QUITT_TIMER_SEND, _tlsoipCReceiptDelay, _lastReceiptSeqNumDataTel);
                                             }
 
                                             // Datenempfang melden...
@@ -1178,25 +1201,27 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             handleAsyncSend(selector);
         }
 
+        // ToDo freigeben nach Test: ###Start: Geändert inovat auf Server
+
         /**
          * Sendet eine Aktion für dieses Verbindungsobjekt zur Ausführung an den Protokoll-Thread.
          *
-         * @param action Auszuführende Aktion
+         * @param action           Auszuführende Aktion
+         * @param seqNum           SequenzNummer des Telegramms, welches quittiert werden soll
+         * @param sofortQuittieren <code>true</code>, wenn Quittierung in jedem Fall sofort erfolgen soll, sonst
+         *                         <code>false</code>.
          */
-        private void notifyWorker(Server.ActionType action) {
-            _worker.notify(this, action);
+        private void notifyWorker(Server.ActionType action, int seqNum, boolean sofortQuittieren) {
+            _worker.notify(this, action, seqNum, sofortQuittieren);
         }
 
-        /**
-         * Initiiert den Abbruch und erneuten Verbindungsaufbau einer bestehenden Verbindung mit evtl. geänderten
-         * Parametern
-         */
+        /** Initiiert den Abbruch und erneuten Verbindungsaufbau einer bestehenden Verbindung mit evtl. geänderten Parametern */
         public void reload() {
             DEBUG.fine(String.format("reload %s", this));
 
             synchronized (_protocolLock) {
                 if ((_protocolState == ProtocolState.STARTED) || (_protocolState == ProtocolState.STARTING)) {
-                    notifyWorker(ActionType.RELOAD_CALLED);
+                    notifyWorker(ActionType.RELOAD_CALLED, 0, false);
                 }
             }
         }
@@ -1208,14 +1233,40 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
          * @param delaySeconds Verzögerungszeit in Sekunden nach der die Aktion ausgeführt werden soll.
          */
         private void scheduleActionTimer(final Server.ActionType actionType, int delaySeconds) {
+            scheduleActionTimer(actionType, delaySeconds, 0, false);
+        }
+
+        /**
+         * Plant eine Aktion mit Hilfe eines Timer-Objekts zur späteren Ausführung ein.
+         *
+         * @param actionType   Auszufhrende Aktion
+         * @param delaySeconds Verzögerungszeit in Sekunden nach der die Aktion ausgeführt werden soll.
+         * @param seqNum       SequenzNummer des letzten empfangenen Datentelegramms
+         */
+        private void scheduleActionTimer(final Server.ActionType actionType, int delaySeconds, final int seqNum) {
+            scheduleActionTimer(actionType, delaySeconds, seqNum, false);
+        }
+
+        /**
+         * Plant eine Aktion mit Hilfe eines Timer-Objekts zur späteren Ausführung ein.
+         *
+         * @param actionType       Auszufhrende Aktion
+         * @param delaySeconds     Verzögerungszeit in Sekunden nach der die Aktion ausgeführt werden soll.
+         * @param seqNum           SequenzNummer des Telegramms, welches quittiert werden soll
+         * @param sofortQuittieren <code>true</code>, wenn Quittierung in jedem Fall sofort erfolgen soll, sonst
+         *                         <code>false</code>.
+         */
+        private void scheduleActionTimer(final Server.ActionType actionType, int delaySeconds, final int seqNum, final boolean sofortQuittieren) {
             final TimerTask timerTask = new TimerTask() {
                 public void run() {
-                    notifyWorker(actionType);
+                    notifyWorker(actionType, seqNum, sofortQuittieren);
                 }
             };
 
             _timer.schedule(timerTask, delaySeconds * 1000L);
         }
+
+        // ToDo freigeben nach Test: ###Ende: Geändert inovat auf Server
 
         /**
          * Initiiert den Versand eines Telegramms.
@@ -1236,7 +1287,9 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
             DEBUG.finest(String.format("Telegramm wird zum Versand gepuffert, Priorität: %d", priority));
             _sendChannel.put(new Server.PriorizedByteArray(bytes, priority));
-            notifyWorker(Server.ActionType.SEND_CALLED);
+
+            // ToDo freigeben nach Test: Geändert inovat auf Server
+            notifyWorker(Server.ActionType.SEND_CALLED, 0, false);
         }
 
         //~ SET METHODEN ======================================================
@@ -1279,7 +1332,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                 throw new RuntimeException(e);
             }
 
-            notifyWorker(Server.ActionType.SHUTDOWN_CALLED);
+            // ToDo freigeben nach Test: Geändert inovat auf Server
+            notifyWorker(Server.ActionType.SHUTDOWN_CALLED, 0, false);
         }
     }
 
@@ -1288,8 +1342,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
     private static class PriorizedByteArray implements PriorizedObject {
 
         /**
-         * Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass
-         * keine weiteren Telegramme mehr versendet werden sollen.
+         * Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass keine
+         * weiteren Telegramme mehr versendet werden sollen.
          */
         private final byte[] _bytes;
 
@@ -1313,8 +1367,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         //~ GET METHODEN ======================================================
 
         /**
-         * @return Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code>
-         *         signalisiert, dass keine weiteren Telegramme mehr versendet werden sollen.
+         * @return Array mit den einzelnen Bytes des zu versendenden Telegramms. Der Wert <code>null</code> signalisiert, dass
+         *         keine weiteren Telegramme mehr versendet werden sollen.
          */
         public byte[] getBytes() {
             return _bytes;
@@ -1334,8 +1388,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
     private class Worker implements Runnable {
 
         /**
-         * Selektor-Objekt, mit dessen Hilfe alle Kommunikationsoperationen (Verbindungsaufbau, Versand und Empfang von
-         * Daten) ohne zusätzliche Threads asynchron ausgeführt werden.
+         * Selektor-Objekt, mit dessen Hilfe alle Kommunikationsoperationen (Verbindungsaufbau, Versand und Empfang von Daten)
+         * ohne zusätzliche Threads asynchron ausgeführt werden.
          */
         private final Selector _selector;
 
@@ -1356,23 +1410,27 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
 
         //~ METHODEN ==========================================================
 
+        // ToDo freigeben nach Test: ###Start: Geändert inovat auf Server
+
         /**
-         * Kann von einem beliebigen Thread aufgerufen werden, um dem Protokoll-Thread zu signalisieren, dass eine
-         * bestimmte Aktion ausgeführt werden soll.
+         * Kann von einem beliebigen Thread aufgerufen werden, um dem Protokoll-Thread zu signalisieren, dass eine bestimmte
+         * Aktion ausgeführt werden soll.
          *
-         * @param link   Verbindung, auf die sich die Aktion bezieht.
-         * @param action Durchzuführende Aktion
+         * @param link             Verbindung, auf die sich die Aktion bezieht.
+         * @param action           Durchzuführende Aktion
+         * @param seqNum           SequenzNummer des Telegramms, welches quittiert werden soll
+         * @param sofortQuittieren <code>true</code>, wenn Quittierung in jedem Fall sofort erfolgen soll, sonst
+         *                         <code>false</code>.
          */
-        public void notify(Server.Link link, Server.ActionType action) {
-            _workQueue.put(new WorkAction(link, action));
+        public void notify(Server.Link link, Server.ActionType action, int seqNum, boolean sofortQuittieren) {
+            _workQueue.put(new WorkAction(link, action, seqNum, sofortQuittieren));
             DEBUG.finer("Aufruf von _selector.wakeup()");
             _selector.wakeup();
         }
 
-        /**
-         * Methode, die beim Start des Protokoll-Threads aufgerufen wird und die asynchrone Protokollsteuerung
-         * implementiert.
-         */
+        // ToDo freigeben nach Test: ###Ende: Geändert inovat auf Server
+
+        /** Methode, die beim Start des Protokoll-Threads aufgerufen wird und die asynchrone Protokollsteuerung implementiert. */
         public void run() {
             synchronized (_protocolLock) {
 
@@ -1394,10 +1452,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             DEBUG.fine("TSLoIP: 30 Sekunden warten: " + toString());
 
             try {
-
-                // ToDo: Testweise für NI 5 Minuten warten
-                // Thread.sleep(30000);
-                Thread.sleep(30000 * 2 * 5);
+                Thread.sleep(30000);
             }
             catch (InterruptedException e) {
 
@@ -1430,7 +1485,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                         Server.Worker.WorkAction action;
 
                         while (null != (action = _workQueue.poll(0))) {
-                            action._link.handleAction(action._action, _selector);
+                            action._link.handleAction(action._action, _selector, 0, false);
                         }
 
                         try {
@@ -1475,8 +1530,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         }
 
         /**
-         * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke. Das genaue Format ist nicht festgelegt und kann
-         * sich ändern..
+         * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke. Das genaue Format ist nicht festgelegt und kann sich
+         * ändern..
          *
          * @return Informationen dieses Objekts für Debug-Zwecke
          */
@@ -1485,6 +1540,8 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
         }
 
         //~ INNERE KLASSEN ====================================================
+
+        // ToDo freigeben nach Test: ###Start: Geändert inovat auf Server
 
         /**
          * Hilfsklasse, die zur Speicherung einer Aktion zusammen mit der Verbindung, auf die sich die Aktion bezieht,
@@ -1498,6 +1555,12 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
             /** Zur Speicherung der Verbindung */
             public final Server.Link _link;
 
+            /** Zur Speicherung der SeqNum */
+            public final int _seqNum;
+
+            /** Zur Speicherung der Kennung, dass sofort quittiert werden soll */
+            public final boolean _sofortQuittieren;
+
             //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ======
 
             /**
@@ -1507,15 +1570,42 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
              * @param action Zu speichernde Aktion
              */
             public WorkAction(Server.Link link, Server.ActionType action) {
-                _link   = link;
-                _action = action;
+                this(link, action, 0, false);
+            }
+
+            /**
+             * Erzeugt ein neues Hilfsobjekt für eine Aktion, die an einer Verbindung auszuführen ist.
+             *
+             * @param link   Zu speichernde Verbindung
+             * @param action Zu speichernde Aktion
+             * @param seqNum Zu speichernde SeqNum
+             */
+            public WorkAction(Server.Link link, Server.ActionType action, int seqNum) {
+                this(link, action, seqNum, false);
+            }
+
+            /**
+             * Erzeugt ein neues Hilfsobjekt für eine Aktion, die an einer Verbindung auszuführen ist.
+             *
+             * @param link             Zu speichernde Verbindung
+             * @param action           Zu speichernde Aktion
+             * @param seqNum           Zu speichernde SeqNum
+             * @param sofortQuittieren Zu speichernde Kennung sofort quittieren
+             */
+            public WorkAction(Server.Link link, Server.ActionType action, int seqNum, boolean sofortQuittieren) {
+                _link             = link;
+                _action           = action;
+                _seqNum           = seqNum;
+                _sofortQuittieren = sofortQuittieren;
             }
 
             //~ METHODEN ======================================================
 
+            // ToDo freigeben nach Test: ###Ende: Geändert inovat auf Server
+
             /**
-             * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke. Das genaue Format ist nicht festgelegt und
-             * kann sich ändern..
+             * Ausgabe von Informationen für dieses Objekt für Debug-Zwecke. Das genaue Format ist nicht festgelegt und kann sich
+             * ändern..
              *
              * @return Informationen dieses Objekts für Debug-Zwecke
              */
