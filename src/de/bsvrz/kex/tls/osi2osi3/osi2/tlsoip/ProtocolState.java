@@ -85,4 +85,4 @@ public final class ProtocolState {
 }
 
 
-//~Formatiert mit 'inovat Kodierkonvention' am 06.04.10
+//~Formatiert mit 'inovat Kodierkonvention' am 27.10.11

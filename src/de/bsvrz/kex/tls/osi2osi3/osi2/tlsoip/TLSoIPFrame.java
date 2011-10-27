@@ -34,6 +34,8 @@ package de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip;
 
 import de.bsvrz.sys.funclib.debug.Debug;
 
+//~ JDK IMPORTE ===============================================================
+
 import java.nio.ByteBuffer;
 
 //~ KLASSEN ===================================================================
@@ -323,4 +325,4 @@ public class TLSoIPFrame {
 }
 
 
-//~Formatiert mit 'inovat Kodierkonvention' am 06.04.10
+//~Formatiert mit 'inovat Kodierkonvention' am 27.10.11
