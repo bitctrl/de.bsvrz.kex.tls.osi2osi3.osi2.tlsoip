@@ -471,6 +471,9 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
          */
         private int _tlsoipCReceiptTimeout;
 
+        /** Flag das signalisiert, dass Timer für die Quittungsüberwachung nach Datenversand einmal gestartet werden muss. */
+        private boolean _tlsoipCReceiptTimeoutGestartet;
+
         /** Aktuell asynchron zu sendendes Telegramm */
         byte[] _packetOnTheAir = null;
 
@@ -844,9 +847,20 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                             // Hätte Quittierungs-Telegramm bereits empfangen werden müssen?
                             if (_tlsoipCReceiptTimeout < durationSinceLastSendDataTel) {
 
-                                // Ja. Verbindung abbrechen und nach Wartezeit neu aufbauen.
-                                DEBUG.warning(String.format("Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes Quittungs-Telegramm vor %ds > Parameter tlsoip.C_ReceiptTimeout %d", durationSinceLastSendDataTel, _tlsoipCReceiptTimeout));
-                                closeChannel();
+                                // ..aber nur, wenn überhaupt Quittung erwartet werden darf
+                                if (_countSendDataTel > 0) {
+
+                                    // Ja. Verbindung abbrechen ....
+                                    DEBUG.warning(String.format("Verbindung wird wegen Zeitüberschreibung initialisiert (Empfang letztes Quittungs-Telegramm vor %ds > Parameter tlsoip.C_ReceiptTimeout %d", durationSinceLastSendDataTel, _tlsoipCReceiptTimeout));
+
+                                    // ...und nach Wartezeit neu aufbauen (passiert jetzt wieder indirekt beim Verschicken des ersten Datentelegramms).
+                                    _tlsoipCReceiptTimeoutGestartet = false;
+                                    closeChannel();
+                                } else {
+
+                                    // Nein, aber Timer wieder auf Default setzen
+                                    scheduleActionTimer(ActionType.QUITT_TIMER_RECEIVE, _tlsoipCReceiptTimeout);
+                                }
                             } else {
 
                                 // Nein, aber bald. Timer neu setzen
@@ -995,6 +1009,12 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                                         _sendBuffer.put(tlsoIPFrame.getTel());
                                         _sendBuffer.flip();
                                         DEBUG.fine(String.format("--> %s %s Datentelegramm gesendet %d", this, new Date().toString(), tlsoIPFrame.getSeqNum()));
+
+                                        if (!_tlsoipCReceiptTimeoutGestartet) {
+                                            DEBUG.fine("inovat: ActionType.QUITT_TIMER_RECEIVE gestartet");
+                                            scheduleActionTimer(ActionType.QUITT_TIMER_RECEIVE, _tlsoipCReceiptTimeout);
+                                            _tlsoipCReceiptTimeoutGestartet = true;
+                                        }
                                     }
                                 }
                             }
@@ -1485,7 +1505,7 @@ public class Server extends TLSoIP implements PropertyQueryInterface {
                         Server.Worker.WorkAction action;
 
                         while (null != (action = _workQueue.poll(0))) {
-                            action._link.handleAction(action._action, _selector, 0, false);
+                            action._link.handleAction(action._action, _selector, action._seqNum, action._sofortQuittieren);
                         }
 
                         try {
