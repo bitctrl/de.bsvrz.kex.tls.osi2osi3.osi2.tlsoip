@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="SWE: de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip" default="build-swe" basedir=".">
+	<!-- Status: ZERT, FREI, BETA, PROT, EXPT   -->
+	<property name="swe.status" value="FREI"/>
+	<!-- Version   -->
+	<property name="swe.version" value="V2.0.0"/>
 
 	<!-- Angabe der Lizenzen für diese SWE, mögliche Werte: "BEIBEHALTEN", "INOVAT", "GPL", "LGPL"  -->
 	<property name="swe-lizenz" value="GPL"/>
