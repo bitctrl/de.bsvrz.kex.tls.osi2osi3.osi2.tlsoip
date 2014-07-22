@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011 by inovat, innovative systeme - verkehr - tunnel - technik, Dipl.-Ing. H. C. Kniss
+ * Copyright (c) 2010 - 2014 by inovat, innovative systeme - verkehr - tunnel - technik, Dipl.-Ing. H. C. Kniss
  *
  * This file is part of de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip.TLSoIP
  *
@@ -19,10 +19,10 @@
  *
  * Contact Information:
  * inovat, Dipl.-Ing. H. C. Kniss
- * Koelner Strasse 30
- * D-50859 Koeln
- * +49 (0)2234 4301 800
- * info@invat.de
+ * An der Krautwiese 37
+ * D-53783 Eitorf
+ * +49 (0)2243 8464 193
+ * info@inovat.de
  * www.inovat.de
  */
 
@@ -37,7 +37,7 @@ import de.bsvrz.kex.tls.osi2osi3.osi2.api.AbstractDataLinkLayer;
 //~ KLASSEN ===================================================================
 
 /**
- * Abstrakte Klasse für den OSI2OSI3 {@link AbstractDataLinkLayer}.
+ * Abstrakte Klasse für den OSI2OSI3 {@link de.bsvrz.kex.tls.osi2osi3.osi2.api.AbstractDataLinkLayer}.
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
  * @author Dipl.-Ing. Hans Christian Kniß (HCK)
@@ -78,4 +78,4 @@ abstract class TLSoIP extends AbstractDataLinkLayer {
 }
 
 
-//~Formatiert mit 'inovat Kodierkonvention' am 27.10.11
+//~Formatiert mit 'inovat Kodierkonvention' am 22.07.14
