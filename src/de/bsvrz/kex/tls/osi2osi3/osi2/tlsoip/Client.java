@@ -852,7 +852,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                             int durationSinceLastSendDataTel = (int) ((System.currentTimeMillis() - _lastSendTimeDataTel) / 1000L);
 
                             // Hätte Quittierungs-Telegramm bereits empfangen werden müssen?
-                            if (_tlsoipCReceiptTimeout < durationSinceLastSendDataTel) {
+                            if (_tlsoipCReceiptTimeout <= durationSinceLastSendDataTel) {
 
                                 // ..aber nur, wenn überhaupt Quittung erwartet werden darf
                                 if (_countSendDataTel > 0) {
@@ -905,7 +905,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                                 int durationSinceLastReceiptDataTel = (int) ((System.currentTimeMillis() - _lastReceiptTimeDataTel) / 1000L);
 
                                 // Muss Quittierungs-Telegramm versendet werden ?
-                                if ((_lastReceiptSeqNumDataTel != _lastQuittSeqNumDataTel) && ((_tlsoipCReceiptDelay < durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount) || (sofortQuittieren))) {
+                                if ((_lastReceiptSeqNumDataTel != _lastQuittSeqNumDataTel) && ((_tlsoipCReceiptDelay <= durationSinceLastReceiptDataTel) || (_countReceiptDataTel >= _tlsoipCReceiptCount) || (sofortQuittieren))) {
 
                                     // Ja (erfolgt in handleAsyncSend()).
                                     _sendQuittTel = true;

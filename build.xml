@@ -3,7 +3,7 @@
 	<!-- Status: ZERT, FREI, BETA, PROT, EXPT   -->
 	<property name="swe.status" value="FREI"/>
 	<!-- Version   -->
-	<property name="swe.version" value="V2.1.0"/>
+	<property name="swe.version" value="V2.1.1"/>
 
 	<!-- Angabe der Lizenzen für diese SWE, mögliche Werte: "BEIBEHALTEN", "INOVAT", "GPL", "LGPL"  -->
 	<property name="swe-lizenz" value="GPL"/>
