@@ -37,10 +37,10 @@ import de.bsvrz.kex.tls.osi2osi3.osi2.api.AbstractDataLinkLayer;
 //~ KLASSEN ===================================================================
 
 /**
- * Abstrakte Klasse für den OSI2OSI3 {@link de.bsvrz.kex.tls.osi2osi3.osi2.api.AbstractDataLinkLayer}.
+ * Abstrakte Klasse fÃ¼r den OSI2OSI3 {@link de.bsvrz.kex.tls.osi2osi3.osi2.api.AbstractDataLinkLayer}.
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
- * @author Dipl.-Ing. Hans Christian Kniß (HCK)
+ * @author Dipl.-Ing. Hans Christian KniÃŸ (HCK)
  * @version $Revision$ / $Date$ / ($Author$)
  */
 abstract class TLSoIP extends AbstractDataLinkLayer {
@@ -58,7 +58,7 @@ abstract class TLSoIP extends AbstractDataLinkLayer {
     //~ GET METHODEN ==========================================================
 
     /**
-     * Liefert den Standard-Wert für eine Eigenschaft an einem Anschlusspunkt bei TLS over IP.
+     * Liefert den Standard-Wert fÃ¼r eine Eigenschaft an einem Anschlusspunkt bei TLS over IP.
      *
      * @param name der Eigenschaft.
      * @return Standard-Wert der abgefragten Eigenschaft.

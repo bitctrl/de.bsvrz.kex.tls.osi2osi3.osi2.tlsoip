@@ -46,7 +46,7 @@ import java.nio.ByteBuffer;
  * TLSoIPFrame Testklasse.
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
- * @author Dipl.-Ing. Hans Christian Kniß (HCK)
+ * @author Dipl.-Ing. Hans Christian KniÃŸ (HCK)
  * @version $Revision$ / $Date$ / ($Author$)
  */
 public class TLSoIPFrameTest {
@@ -187,7 +187,7 @@ public class TLSoIPFrameTest {
             readBuffer.put((byte) (wert & 0xff));  // ..
         }
 
-        // Zum Lesen zurücksetzen ...
+        // Zum Lesen zurÃ¼cksetzen ...
         readBuffer.flip();
 
         // Zuerst Header aus Buffer erzeugen...
@@ -201,10 +201,10 @@ public class TLSoIPFrameTest {
         Assert.assertEquals(10, tlSoIPFrame.getHeader().length);
         Assert.assertEquals(0, tlSoIPFrame.getData().length);
 
-        // ...dann weitere Daten als Nutzdaten aus Buffer anhängen...
+        // ...dann weitere Daten als Nutzdaten aus Buffer anhÃ¤ngen...
         tlSoIPFrame.addData(readBuffer);
 
-        // Ergebniss wie oben, aber Datenlänge über getData() muss jetzt 300 sein.
+        // Ergebniss wie oben, aber DatenlÃ¤nge Ã¼ber getData() muss jetzt 300 sein.
         Assert.assertEquals(true, tlSoIPFrame.isTLSoIPFrame());
         Assert.assertEquals(true, tlSoIPFrame.isDataTel());
         Assert.assertEquals(511, tlSoIPFrame.getSeqNum());
@@ -223,7 +223,7 @@ public class TLSoIPFrameTest {
             wert++;
         }
 
-        // Isolierter Test der getData() Rückgabe in eigener Datenstruktur (eigentlich überflüssig, da schon zuvor getestet.
+        // Isolierter Test der getData() RÃ¼ckgabe in eigener Datenstruktur (eigentlich Ã¼berflÃ¼ssig, da schon zuvor getestet.
         wert = 0;
 
         byte[] nutzdaten = tlSoIPFrame.getData();

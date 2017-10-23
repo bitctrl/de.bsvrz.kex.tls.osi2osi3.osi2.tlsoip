@@ -58,14 +58,14 @@ import java.util.Timer;
 //~ KLASSEN ===================================================================
 
 /**
- * Implementiert einen TestServer für TLSoIP, mit dem ein SM simuliert werden kann, welches über TLSoIP angebunden wird
+ * Implementiert einen TestServer fÃ¼r TLSoIP, mit dem ein SM simuliert werden kann, welches Ã¼ber TLSoIP angebunden wird
  * und als Server fungiert.
  * <p/>
- * Folgende Funktionen werden unterstützt: <ul> <li>Verbindungseinstellungen werden aus dem übergebenen Anschlusspunkt
- * übernommen.</li> <li></li> <li></li> <li></li> <li></li> </ul>
+ * Folgende Funktionen werden unterstÃ¼tzt: <ul> <li>Verbindungseinstellungen werden aus dem Ã¼bergebenen Anschlusspunkt
+ * Ã¼bernommen.</li> <li></li> <li></li> <li></li> <li></li> </ul>
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
- * @author Dipl.-Ing. Hans Christian Kniß (HCK)
+ * @author Dipl.-Ing. Hans Christian KniÃŸ (HCK)
  * @version $Revision: 0 $ / $Date: neu $ / ($Author: HCK $)
  */
 public class TestServerTLSoIP implements StandardApplication {
@@ -120,41 +120,41 @@ public class TestServerTLSoIP implements StandardApplication {
     /** Flag das signalisiert, dass ein Quittungs-Telegramm versendet werden soll */
     private boolean _sendQuittTel;
 
-    /** Serverport, auf dem Anfragen entgegengenommen werden. Dynamische und oder Private Ports (49152 bis 65535) gemäß IANA konfigurierbar */
+    /** Serverport, auf dem Anfragen entgegengenommen werden. Dynamische und oder Private Ports (49152 bis 65535) gemÃ¤ÃŸ IANA konfigurierbar */
     private int _tlsoipCAcceptPort;
 
     /** Portnummer des Servers */
     private int _tlsoipCAcceptPortA;
 
-    /** Zeit [s], nach der ein Keep-Alive-Telegramm an die Gegenstelle versendet werden muss (0=ausgeschaltet für Testzwecke, 1...3599) */
+    /** Zeit [s], nach der ein Keep-Alive-Telegramm an die Gegenstelle versendet werden muss (0=ausgeschaltet fÃ¼r Testzwecke, 1...3599) */
     private int _tlsoipCHelloDelay;
 
-    /** Zeit [s], nach der spätestens ein Keep-Alive-Telegramm der Gegenstelle erwartet wird ( > C_HelloDelay der Gegenstelle), (0=ausgeschaltet für Testzwecke, 1...3600) */
+    /** Zeit [s], nach der spÃ¤testens ein Keep-Alive-Telegramm der Gegenstelle erwartet wird ( > C_HelloDelay der Gegenstelle), (0=ausgeschaltet fÃ¼r Testzwecke, 1...3600) */
     private int _tlsoipCHelloTimeout;
 
-    /** Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein Quittungstelegramm versendet werden muss/erwartet wird (1..255) */
+    /** Anzahl empfangener/gesendeter Telegramme, nach der spÃ¤testens ein Quittungstelegramm versendet werden muss/erwartet wird (1..255) */
     private int _tlsoipCReceiptCount;
 
-    /** Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die Gegenstelle versendet werden muss (1..59) */
+    /** Zeit [s], nach der nach Erhalt eines Telegramms spÃ¤tenstens ein Quittierungstelegramm an die Gegenstelle versendet werden muss (1..59) */
     private int _tlsoipCReceiptDelay;
 
-    /** Zeit [s], nach der spätestens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der Gegenstelle) (1..60) */
+    /** Zeit [s], nach der spÃ¤testens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der Gegenstelle) (1..60) */
     private int _tlsoipCReceiptTimeout;
 
-    /** Zeit [s], nach der bei Nichtbestehen einer Verbindung spätestens ein neuer Verbindungsaufbau initiiert werden muss  (0=sofort, 1...3600). */
+    /** Zeit [s], nach der bei Nichtbestehen einer Verbindung spÃ¤testens ein neuer Verbindungsaufbau initiiert werden muss  (0=sofort, 1...3600). */
     private int _tlsoipCReconnectDelay;
 
     /** IP-Adresse des Servers */
     private String  _tlsoipCServerAdrA                  = null;
     private boolean _tcpConnectedWaitingForFirstReceive = false;
 
-    /** Sendepuffer für versendete Telegramme */
+    /** Sendepuffer fÃ¼r versendete Telegramme */
     private ByteBuffer _sendBuffer = ByteBuffer.allocateDirect(28 + MAX_ANZAHL_NUTZDATENBYTES_PRO_OIS2_PAKET);
 
-    /** Empfangspuffer für empfangene Telegramme */
+    /** Empfangspuffer fÃ¼r empfangene Telegramme */
     private ByteBuffer _leseBuffer = ByteBuffer.allocate(3000);
 
-    /** Timerobjekt mit dem zukünftige Aktionen geplant und ausgeführt werden */
+    /** Timerobjekt mit dem zukÃ¼nftige Aktionen geplant und ausgefÃ¼hrt werden */
     private final Timer _timer = new Timer(true);
 
 	//~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==============
@@ -187,31 +187,31 @@ public class TestServerTLSoIP implements StandardApplication {
         /** IP-Adresse des Servers */
         _tlsoipCServerAdrA = "localhost";
 
-        // Serverport, auf dem Anfragen durch den Server entgegengenommen werden. Dynamische und oder Private Ports (49152 bis 65535) gemäß IANA konfigurierbar
+        // Serverport, auf dem Anfragen durch den Server entgegengenommen werden. Dynamische und oder Private Ports (49152 bis 65535) gemÃ¤ÃŸ IANA konfigurierbar
         _tlsoipCAcceptPort = 20000;
 
         // Portnummer des Servers, auf dem der Client eine Verbindung herstellen soll.
         _tlsoipCAcceptPortA = 20000;
 
-        // Zeit [s], nach der ein Keep-Alive-Telegramm an die Gegenstelle versendet werden muss (0=ausgeschaltet für Testzwecke, 1...3599)
+        // Zeit [s], nach der ein Keep-Alive-Telegramm an die Gegenstelle versendet werden muss (0=ausgeschaltet fÃ¼r Testzwecke, 1...3599)
         _tlsoipCHelloDelay = 20;
 
-        // Zeit [s], nach der spätestens ein Keep-Alive-Telegramm der Gegenstelle erwartet wird ( > C_HelloDelay der Gegenstelle), (0=ausgeschaltet für Testzwecke, 1...3600) */
+        // Zeit [s], nach der spÃ¤testens ein Keep-Alive-Telegramm der Gegenstelle erwartet wird ( > C_HelloDelay der Gegenstelle), (0=ausgeschaltet fÃ¼r Testzwecke, 1...3600) */
         _tlsoipCHelloTimeout = 60;
 
-        // Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein Quittungstelegramm versendet werden muss/erwartet wird (1..255)
+        // Anzahl empfangener/gesendeter Telegramme, nach der spÃ¤testens ein Quittungstelegramm versendet werden muss/erwartet wird (1..255)
         _tlsoipCReceiptCount = 10;
 
-        // Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die Gegenstelle versendet werden muss (1..59)
+        // Zeit [s], nach der nach Erhalt eines Telegramms spÃ¤tenstens ein Quittierungstelegramm an die Gegenstelle versendet werden muss (1..59)
         _tlsoipCReceiptDelay = 5;
 
-        // Zeit [s], nach der spätestens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der Gegenstelle) (1..60)
+        // Zeit [s], nach der spÃ¤testens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der Gegenstelle) (1..60)
         _tlsoipCReceiptTimeout = 60;
 
-        // Zeit [s], nach der bei Nichtbestehen einer Verbindung spätestens ein neuer Verbindungsaufbau initiiert werden muss  (0=sofort, 1...3600).
+        // Zeit [s], nach der bei Nichtbestehen einer Verbindung spÃ¤testens ein neuer Verbindungsaufbau initiiert werden muss  (0=sofort, 1...3600).
         _tlsoipCReconnectDelay = 60;
 
-        // Über die PID den Anschlusspunkt ermitteln und die zugehörigen Parameter anmelden.
+        // Ãœber die PID den Anschlusspunkt ermitteln und die zugehÃ¶rigen Parameter anmelden.
         _pidAPClient = argumentList.fetchArgument(String.format("-pidAPClient=%s", "ap.unbekannt")).asNonEmptyString();
 
         // ToDo: Objekt ermitteln
@@ -221,24 +221,24 @@ public class TestServerTLSoIP implements StandardApplication {
     /**
      * Startet den Server und verarbeitet die Telegramme.
      *
-     * @throws java.io.IOException wenn bei der Erstellung der Verbindung ein grundsätzliches Problem auftritt.
+     * @throws java.io.IOException wenn bei der Erstellung der Verbindung ein grundsÃ¤tzliches Problem auftritt.
      */
     private void start() throws IOException {
         Selector            selector            = Selector.open();
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
 
-        serverSocketChannel.configureBlocking(false);  // Asyncrone Verarbeitung ermöglichen
+        serverSocketChannel.configureBlocking(false);  // Asyncrone Verarbeitung ermÃ¶glichen
 
         ServerSocket serverSocket = serverSocketChannel.socket();
 
-        // IP-Adresse und Port für den Server festlegen
-        InetAddress       ipAddresse       = InetAddress.getByName(_tlsoipCServerAdrA);               // Server läuft beim Testen immer lokal !!
+        // IP-Adresse und Port fÃ¼r den Server festlegen
+        InetAddress       ipAddresse       = InetAddress.getByName(_tlsoipCServerAdrA);               // Server lÃ¤uft beim Testen immer lokal !!
         InetSocketAddress ipSocketAddresse = new InetSocketAddress(ipAddresse, _tlsoipCAcceptPortA);  // es wird der PORT verwendet, der beim Client-AP eingetragen wurde !!
 
         /*
-         *       // IP-Adresse und Port für den Client festlegen
+         *       // IP-Adresse und Port fÃ¼r den Client festlegen
          *           // Es wird die IP verwendet, der beim Server-AP eingetragen wurde.
-         *           // Wird eigentlich nur für einen Client verwendet.
+         *           // Wird eigentlich nur fÃ¼r einen Client verwendet.
          *           // Zum Test eines Servers durch den TestClient muss diese IP aber eingetragen werden,
          *           // wenn nicht auf einem Rechner getestet wird (--> dann wird automatisch "localhost" verwendet)
          *           InetAddress adresse = InetAddress.getByName(_tlsoipCServerAdrA);

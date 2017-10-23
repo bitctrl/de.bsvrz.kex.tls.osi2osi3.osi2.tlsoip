@@ -44,7 +44,7 @@ import org.junit.Before;
  * ProtocolState Testklasse.
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
- * @author Dipl.-Ing. Hans Christian Kniﬂ (HCK)
+ * @author Dipl.-Ing. Hans Christian Kni√ü (HCK)
  * @version $Revision$ / $Date$ / ($Author$)
  */
 public class ProtocolStateTest {

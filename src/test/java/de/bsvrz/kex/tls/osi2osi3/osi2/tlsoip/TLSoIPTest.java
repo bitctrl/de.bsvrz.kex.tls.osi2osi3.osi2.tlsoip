@@ -46,7 +46,7 @@ import org.junit.Before;
  * TLSoIP Testklasse.
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
- * @author Dipl.-Ing. Hans Christian Kniß (HCK)
+ * @author Dipl.-Ing. Hans Christian KniÃŸ (HCK)
  * @version $Revision$ / $Date$ / ($Author$)
  */
 public class TLSoIPTest {
@@ -83,7 +83,7 @@ public class TLSoIPTest {
     @org.junit.Test
     public void testGetDefaultProperty() throws Exception {
 
-        // Standard Verbindungsparameter für beide Verbindungspartner
+        // Standard Verbindungsparameter fÃ¼r beide Verbindungspartner
         Assert.assertEquals("nein", _tlSoIP.getDefaultProperty("tlsoip.C_SecureConnection"));
         Assert.assertEquals("30", _tlSoIP.getDefaultProperty("tlsoip.C_HelloDelay"));
         Assert.assertEquals("60", _tlSoIP.getDefaultProperty("tlsoip.C_HelloTimeout"));
@@ -91,7 +91,7 @@ public class TLSoIPTest {
         Assert.assertEquals("15", _tlSoIP.getDefaultProperty("tlsoip.C_ReceiptDelay"));
         Assert.assertEquals("30", _tlSoIP.getDefaultProperty("tlsoip.C_ReceiptTimeout"));
 
-        // Standard Verbindungsparameter für den Client
+        // Standard Verbindungsparameter fÃ¼r den Client
         Assert.assertEquals("", _tlSoIP.getDefaultProperty("tlsoip.C_ServerAdrA"));
         Assert.assertEquals("", _tlSoIP.getDefaultProperty("tlsoip.C_ServerAdrB"));
         Assert.assertEquals("", _tlSoIP.getDefaultProperty("tlsoip.C_AcceptPortA"));
@@ -101,7 +101,7 @@ public class TLSoIPTest {
         Assert.assertEquals("00 05 00", _tlSoIP.getDefaultProperty("tlsoip.C_ConnectDelay"));
         Assert.assertEquals("nein", _tlSoIP.getDefaultProperty("tlsoip.waitForInitialReceive"));
 
-        // Standard Verbindungsparameter für den Server
+        // Standard Verbindungsparameter fÃ¼r den Server
         Assert.assertEquals("", _tlSoIP.getDefaultProperty("tlsoip.C_AcceptPort"));
         Assert.assertEquals("aktiv", _tlSoIP.getDefaultProperty("tlsoip.C_PortMode"));
         Assert.assertEquals("1", _tlSoIP.getDefaultProperty("tlsoip.C_ClientCount"));

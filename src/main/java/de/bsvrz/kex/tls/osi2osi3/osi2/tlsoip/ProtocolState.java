@@ -33,27 +33,27 @@ package de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip;
 //~ KLASSEN ===================================================================
 
 /**
- * Definiert die möglichen Zustände eines Protokolls.
+ * Definiert die mÃ¶glichen ZustÃ¤nde eines Protokolls.
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
- * @author Dipl.-Ing. Hans Christian Kniß (HCK)
+ * @author Dipl.-Ing. Hans Christian KniÃŸ (HCK)
  * @version $Revision$ / $Date$ / ($Author$)
  */
 public final class ProtocolState {
 
-    /** Stabiler Zustand für ein noch nicht gestartetes Protokoll. */
+    /** Stabiler Zustand fÃ¼r ein noch nicht gestartetes Protokoll. */
     public static final ProtocolState CREATED = new ProtocolState("Erzeugt");
 
-    /** Übergangszustand für ein startendes Protokoll. */
+    /** Ãœbergangszustand fÃ¼r ein startendes Protokoll. */
     public static final ProtocolState STARTING = new ProtocolState("Wird gestartet");
 
-    /** Stabiler Zustand für ein gestartetes Protokoll. */
+    /** Stabiler Zustand fÃ¼r ein gestartetes Protokoll. */
     public static final ProtocolState STARTED = new ProtocolState("Gestartet");
 
-    /** Übergangszustand für ein zu stoppendes Protokoll. */
+    /** Ãœbergangszustand fÃ¼r ein zu stoppendes Protokoll. */
     public static final ProtocolState STOPPING = new ProtocolState("Wird gestoppt");
 
-    /** Stabiler Zustand für ein gestopptes Protokoll. */
+    /** Stabiler Zustand fÃ¼r ein gestopptes Protokoll. */
     public static final ProtocolState STOPPED = new ProtocolState("Gestoppt");
 
     //~ FELDER ================================================================
@@ -64,7 +64,7 @@ public final class ProtocolState {
     //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==============
 
     /**
-     * Nicht öffentlicher Konstruktor der zum Erzeugen der vordefinierten Zustände benutzt wird.
+     * Nicht Ã¶ffentlicher Konstruktor der zum Erzeugen der vordefinierten ZustÃ¤nde benutzt wird.
      *
      * @param name Name des Zustandes.
      */
@@ -75,7 +75,7 @@ public final class ProtocolState {
     //~ METHODEN ==============================================================
 
     /**
-     * Liefert eine textuelle Beschreibung dieses Zustands zurück. Das genaue Format ist nicht festgelegt und kann sich ändern.
+     * Liefert eine textuelle Beschreibung dieses Zustands zurÃ¼ck. Das genaue Format ist nicht festgelegt und kann sich Ã¤ndern.
      *
      * @return Beschreibung dieses Zustands.
      */

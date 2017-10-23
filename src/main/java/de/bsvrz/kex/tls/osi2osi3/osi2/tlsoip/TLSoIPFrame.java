@@ -41,20 +41,20 @@ import java.nio.ByteBuffer;
 //~ KLASSEN ===================================================================
 
 /**
- * Telegrammrahmen für ein TLSoIP-Telegramm, welches aus Header und Daten besteht.
+ * Telegrammrahmen fÃ¼r ein TLSoIP-Telegramm, welches aus Header und Daten besteht.
  * <p/>
- * Genaue Beschreibung des Aufbaus siehe TLS 2009 "Datenübertragung über TCP/IP (TLSoIP)".
+ * Genaue Beschreibung des Aufbaus siehe TLS 2009 "DatenÃ¼bertragung Ã¼ber TCP/IP (TLSoIP)".
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
- * @author Dipl.-Ing. Hans Christian Kniß (HCK)
+ * @author Dipl.-Ing. Hans Christian KniÃŸ (HCK)
  * @version $Revision$ / $Date$ / ($Author$)
  */
 public class TLSoIPFrame {
 
-    /** DebugLogger für Debug-Ausgaben. */
+    /** DebugLogger fÃ¼r Debug-Ausgaben. */
     private static final Debug DEBUG = Debug.getLogger();
 
-    /** Länge des Frame-Headers */
+    /** LÃ¤nge des Frame-Headers */
     public static final int FRAME_HEADER_LENGTH = 10;
 
     /** Sync-Byte (0x68) des Frame-Headers */
@@ -71,7 +71,7 @@ public class TLSoIPFrame {
 
     //~ FELDER ================================================================
 
-    /** Längenangabe im Telegramm */
+    /** LÃ¤ngenangabe im Telegramm */
     private long _len;
 
     /** Sequenznummer im Telegramm */
@@ -92,7 +92,7 @@ public class TLSoIPFrame {
     //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==============
 
     /**
-     * Spezieller Konstruktor, der aus dem übergebenen ByteBuffer lediglich die HeaderDaten eines TLSoIP-Telegramms
+     * Spezieller Konstruktor, der aus dem Ã¼bergebenen ByteBuffer lediglich die HeaderDaten eines TLSoIP-Telegramms
      * ausliest.
      *
      * @param readBuffer Der Buffer mit den Headerdaten des Telegramms.
@@ -102,7 +102,7 @@ public class TLSoIPFrame {
         byte telType = readBuffer.get();
         int  seqNum  = (readBuffer.get() & 0xff) + (readBuffer.get() & 0xff) * 0x100;
 
-        readBuffer.get();  // 2-Byte überlesen -> Reservebytes im Header
+        readBuffer.get();  // 2-Byte Ã¼berlesen -> Reservebytes im Header
         readBuffer.get();
 
         long len = (readBuffer.get() & 0xff) + (readBuffer.get() & 0xff) * 0x100 + (readBuffer.get() & 0x10000) + (readBuffer.get() & 0xff) * 0x1000000;
@@ -124,11 +124,11 @@ public class TLSoIPFrame {
     //~ GET METHODEN ==========================================================
 
     /**
-     * Liefert eine textuelle Beschreibung der unterstützten Telegrammtypen.
+     * Liefert eine textuelle Beschreibung der unterstÃ¼tzten Telegrammtypen.
      *
      * @param telType Code des Telegrammtyps.
      *
-     * @return Textuelle Beschreibung der unterstützten Telegrammtypen.
+     * @return Textuelle Beschreibung der unterstÃ¼tzten Telegrammtypen.
      */
     public static String getTelTypeInfo(int telType) {
         switch ((byte) (telType & 0xff)) {
@@ -148,8 +148,8 @@ public class TLSoIPFrame {
     //~ METHODEN ==============================================================
 
     /**
-     * Liest aus dem übergebenen Buffer die Bytes in den Datenteil des Telegramms. Die Anzahl der zu lesenden Bytes werden
-     * aus der Längenangabe des Headers ermittelt. <p< Liegen nicht genügend Bytes im Buffer vor, wird der Datenteil auf
+     * Liest aus dem Ã¼bergebenen Buffer die Bytes in den Datenteil des Telegramms. Die Anzahl der zu lesenden Bytes werden
+     * aus der LÃ¤ngenangabe des Headers ermittelt. <p< Liegen nicht genÃ¼gend Bytes im Buffer vor, wird der Datenteil auf
      * <code>null</code> gesetzt.
      *
      * @param readBuffer Der Buffer mit den Nutzdaten des Telegramms.
@@ -170,8 +170,8 @@ public class TLSoIPFrame {
      * @param seqNum  Sequenznummer des Telegramms.
      * @param telType Telegrammtyp ({@link #TELTYPE_IB_V1} , {@link #TELTYPE_KEEPALIVE} , {@link #TELTYPE_QUITT} )
      * @param data    Wenn telType = {@link #TELTYPE_IB_V1}, die Nutzdaten, sonst <code>null</code>.
-     * @param len     Wenn <code>data != null</code>, dann wird Länge aus tatsächlicher Nutzdatenlänge ermittelt, ansonsten
-     *                wird für len < 0 der Wert 0 und sonst der übergebene Wert eingestellt.
+     * @param len     Wenn <code>data != null</code>, dann wird LÃ¤nge aus tatsÃ¤chlicher NutzdatenlÃ¤nge ermittelt, ansonsten
+     *                wird fÃ¼r len < 0 der Wert 0 und sonst der Ã¼bergebene Wert eingestellt.
      */
     private void constuctTLSoIPFrame(byte sync, int seqNum, byte telType, byte data[], long len) {
         _sync    = sync;
@@ -234,9 +234,9 @@ public class TLSoIPFrame {
     }
 
     /**
-     * Liefert die Länge der Nutzdaten in Anzahl Bytes.
+     * Liefert die LÃ¤nge der Nutzdaten in Anzahl Bytes.
      *
-     * @return Länge des Datenblocks mit den Nutzdaten.
+     * @return LÃ¤nge des Datenblocks mit den Nutzdaten.
      */
     public long getLen() {
         return _len;
@@ -308,7 +308,7 @@ public class TLSoIPFrame {
     }
 
     /**
-     * Testet, ob es sich um ein gültiges TLSoIP-Telegramm handelt.
+     * Testet, ob es sich um ein gÃ¼ltiges TLSoIP-Telegramm handelt.
      *
      * @return <code>true</code>, wenn erstes Byte im Header == {@link #FRAME_HEADER_SYNC}, sonst <code>false</code>.
      */
