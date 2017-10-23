@@ -1,0 +1,151 @@
+//--------------------------------------------------------------------------------//
+// Diese Datei enthält alle SWE-spezifische Angaben // h i e r   a n p a s s e n  //
+//--------------------------------------------------------------------------------//
+apply plugin: 'java'
+
+//================================================================================
+// SWE-Eigenschaften
+//================================================================================
+ext{
+    sweJavaVersion='1.8'
+    // Status: ZERT, FREI, BETA, PROT, EXPT
+    sweStatus='FREI'
+    // Version
+    sweVersion='V2.1.1'
+    // Group
+    sweGroup='de.bsvrz.kex'
+    // Angabe der Lizenzen für diese SWE, mögliche Werte: "BEIBEHALTEN", "INOVAT", "GPL", "LGPL"
+    sweLizenz='GPL'
+    // Legt die Main-Klasse für die Erstellung des Manifests fest
+    sweMainClass='main.klasse.nicht.Definiert'
+}
+
+//================================================================================
+// Dependencies
+//================================================================================
+//--------------------------------------------------------------------
+// Angabe der benötigten externen Libs für diese SWE
+// (diese lokale Variable sind nicht nötig, die erleichten Angabe von repositories und dependencies)
+//
+// Wichtig: für libExern ist vorausgesetzt, dass die jar-Datei xxx.jar im Ordner xxx liegt:
+// (Entsprechend werden momentan repositories, dependencies und ClassPath im Manifest definiert.
+// Später kann RepoMaven verwendet werden, dann bleibt diese Annahme nur für Manifest _wichtig)
+//--------------------------------------------------------------------
+// Pfad zu libExtern
+def libExternPfad='D:/PE/SWE-Gesamt/lib/extern/'
+def libExternNamen = [
+        'de.bsvrz.dav.daf',
+        'de.bsvrz.sys.funclib.debug',
+        'de.bsvrz.sys.funclib.commandLineArgs',
+        'de.bsvrz.sys.funclib.concurrent',
+        'de.bsvrz.sys.funclib.hexdump',
+        'de.bsvrz.kex.tls.osi2osi3',
+        'de.bsvrz.pat.onlprot'
+]
+//--------------------------------------------------------------------
+// Angabe der benötigten globalen Libs für diese SWE:
+// - für dependencies
+// - für ClassPath in der Manifest-Datei
+// - für Distribution
+// (Variablen können leer sein, aber müssen definiert werden)
+//--------------------------------------------------------------------
+// Pfad zu libGlobal
+def libGlobalPfad='D:/PE/SWE-Gesamt/lib/global/'
+ext {
+    // Angabe der Dateien, die in die Distribution kopiert werden sollen
+    // (alle Daten aus pfad/dir werden in Distribution/lib/dir kopiert):
+    sweLibGlobalDistr = [
+            //[pfad: libGlobalPfad, dir: 'global.junit']
+     ]
+    // Angabe der jar-Dateien für repositories, dependencies und Manifest
+    sweLibGlobal = [
+            //[dir: 'global.junit', name: 'junit-4.8.1']
+     ]
+}
+//--------------------------------------------------------------------
+// Repos für Dependencies (für Compile)
+//--------------------------------------------------------------------
+repositories {
+    // libExtern:
+    flatDir{
+        name 'RepoSWE'
+        libExternNamen.each{
+            lib -> dirs "${libExternPfad}${lib}"
+        }
+    }
+    // libExtern in der Zukunft, wenn alle SWE in MavenRepo publiziert sind
+    // (dann müssen in dependencies auch Versionen und Gruppen angegeben werden):
+    /*
+    maven {
+        url 'file://D:/KM/MavenRepo'
+    }
+    */
+    // libGlobal:
+    if(!sweLibGlobal.empty){
+        flatDir{
+            name 'RepoLibGlobal'
+            sweLibGlobal.each{
+                lib -> dirs "${libGlobalPfad}${lib.dir}"
+            }
+        }
+    }
+    // Wichtig: Voraussetzung für Junit: die jar-Datei xxx.jar liegt im Ordner xxx, Ordner xxx liegt im libExern
+    // (Entsprechend wird Manifest definiert)
+    flatDir {
+        dir "${libExternPfad}/junit-4.8.1"
+    }
+    // Für Test-Compile:
+    flatDir {
+        dir "${libExternPfad}/de.bsvrz.sys.funclib.application"
+    }
+}
+
+//--------------------------------------------------------------------
+// Abhängigkeiten
+//
+// Wichtig: Compile-Angaben unbedingt wie folgt definieren:
+// compile group: 'xxx', name: 'yyy'...
+// Solche Angaben erlauben ClassPath für Manifest zu ermitteln
+// (im Manifest wird 'name' verwendet).
+//--------------------------------------------------------------------
+dependencies {
+    //------
+    // Source:
+    // libGlobal:
+    sweLibGlobal.each{
+        lib -> compile group: '', name: lib.name
+    }
+    // libExtern:
+    libExternNamen.each{
+        lib -> compile group: '', name: lib
+    }
+    //------
+    // Test:
+    testCompile group: '', name: 'junit-4.8.1'
+    testCompile group: '', name: 'de.bsvrz.sys.funclib.application'
+}
+
+//================================================================================
+// Andere Angaben
+//================================================================================
+//--------------------------------------------------------------------
+// Source
+//--------------------------------------------------------------------
+sourceSets {
+    main {
+        resources {
+            exclude { 'nichtVorhanden.txt' }
+        }
+    }
+    test {
+        resources {
+            exclude { 'nichtVorhanden.txt' }
+        }
+    }
+
+}
+//--------------------------------------------------------------------
+// Import der build-swe.gradle
+//--------------------------------------------------------------------
+apply from: 'D:/SE/SWE/de.inovat.build.gradle/v.1.0/build-swe.gradle'
+//--------------------------------------------------------------------
