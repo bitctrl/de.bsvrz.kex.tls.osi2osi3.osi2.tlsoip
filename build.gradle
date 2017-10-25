@@ -3,6 +3,9 @@
 //--------------------------------------------------------------------------------//
 apply plugin: 'java'
 
+// Import der build-swe-setting.gradle
+apply from: 'D:/SE/SWE/de.inovat.build.gradle/v.1.0/build-swe-setting.gradle'
+
 //================================================================================
 // SWE-Eigenschaften
 //================================================================================
@@ -30,13 +33,11 @@ ext{
 // - für Distribution
 // (Variablen können leer sein, aber müssen definiert werden)
 //--------------------------------------------------------------------
-// Pfad zu libGlobal
-def libGlobalPfad='D:/PE/SWE-Gesamt/lib/global/'
 ext {
     // Angabe der Dateien, die in die Distribution kopiert werden sollen
     // (alle Daten aus pfad/dir werden in Distribution/lib/dir kopiert):
     sweLibGlobalDistr = [
-            //[pfad: libGlobalPfad, dir: 'global.junit']
+            //[pfad: sweLibGlobalPfad, dir: 'global.junit']
      ]
     // Angabe der jar-Dateien für repositories, dependencies und Manifest
     sweLibGlobal = [
@@ -47,19 +48,12 @@ ext {
 // Repos für Dependencies (für Compile)
 //--------------------------------------------------------------------
 repositories {
-    // libExtern:
+    // MavenRepo:
     maven {
-        url 'file://D:/KM/MavenRepo'
+        url sweMavenRepoUrl
     }
-    // libGlobal:
-    if(!sweLibGlobal.empty){
-        flatDir{
-            name 'RepoLibGlobal'
-            sweLibGlobal.each{
-                lib -> dirs "${libGlobalPfad}${lib.dir}"
-            }
-        }
-    }
+    // MavenRepoCentral (nötig z.B. für junit)
+    // mavenCentral()
 }
 
 //--------------------------------------------------------------------
@@ -113,5 +107,5 @@ sourceSets {
 //--------------------------------------------------------------------
 // Import der build-swe.gradle
 //--------------------------------------------------------------------
-apply from: 'D:/SE/SWE/de.inovat.build.gradle/v.1.0/build-swe.gradle'
+apply from: sweBuildDatei
 //--------------------------------------------------------------------
