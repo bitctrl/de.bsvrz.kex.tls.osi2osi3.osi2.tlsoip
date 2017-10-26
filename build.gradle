@@ -69,7 +69,7 @@ dependencies {
     // Source:
     // libGlobal:
     sweLibGlobal.each{
-        lib -> compile group: '', name: lib.name
+        lib -> compile group: 'libExtern', name: lib.name, version: '+'
     }
     // libExtern:
     compile group: 'libExtern', name: 'de.bsvrz.dav.daf', version: '+'
