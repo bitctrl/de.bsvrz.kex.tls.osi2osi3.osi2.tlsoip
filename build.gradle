@@ -4,7 +4,7 @@
 apply plugin: 'java'
 
 // Import der build-swe-setting.gradle
-apply from: 'D:/SE/SWE/de.inovat.build.gradle/v.1.0/build-swe-setting.gradle'
+apply from: '../SWE_build.gradle/basis-skripte/build-swe-setting.gradle'
 
 //================================================================================
 // SWE-Eigenschaften
