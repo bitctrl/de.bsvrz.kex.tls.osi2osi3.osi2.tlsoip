@@ -17,7 +17,9 @@ ext{
     sweVersion='V2.1.1'
     // Group
     sweGroup='de.bsvrz.kex'
-    // Angabe der Lizenzen für diese SWE, mögliche Werte: "BEIBEHALTEN", "INOVAT", "GPL", "LGPL"
+    // Angabe der Lizenzen für diese SWE, i.d.R.: "GPL" oder "LGPL"
+    // Verwendet wird die Datei aus dem Ordner "SWE_build.gradle/lizenzen/",
+    // die dem Lizenznamen.txt entspricht (bei "GPL" also die Datei "GPL.txt")
     sweLizenz='GPL'
     // Legt die Main-Klasse für die Erstellung des Manifests fest
     sweMainClass='main.klasse.nicht.Definiert'
