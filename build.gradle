@@ -46,17 +46,6 @@ ext {
             //[dir: 'global.junit', name: 'junit-4.8.1']
      ]
 }
-//--------------------------------------------------------------------
-// Repos für Dependencies (für Compile)
-//--------------------------------------------------------------------
-repositories {
-    // MavenRepo:
-    maven {
-        url sweMavenRepoUrl
-    }
-    // MavenRepoCentral (nötig z.B. für junit)
-    // mavenCentral()
-}
 
 //--------------------------------------------------------------------
 // Abhängigkeiten
