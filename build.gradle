@@ -30,38 +30,27 @@ ext{
 //================================================================================
 //--------------------------------------------------------------------
 // Angabe der benötigten globalen Libs für diese SWE:
-// - für dependencies
-// - für ClassPath in der Manifest-Datei
 // - für Distribution
+// - für ClassPath in der Manifest-Datei
 // (Variablen können leer sein, aber müssen definiert werden)
 //--------------------------------------------------------------------
 ext {
     // Angabe der Dateien, die in die Distribution kopiert werden sollen
     // (alle Daten aus pfad/dir werden in Distribution/lib/dir kopiert):
     sweLibGlobalDistr = [
-            //[pfad: sweLibGlobalPfad, dir: 'global.junit']
+            //[pfad: 'lib', dir: 'libName']
      ]
-    // Angabe der jar-Dateien für repositories, dependencies und Manifest
+    // Angabe der jar-Dateien für Manifest:
     sweLibGlobal = [
             //[dir: 'global.junit', name: 'junit-4.8.1']
      ]
 }
-
 //--------------------------------------------------------------------
 // Abhängigkeiten
-//
-// Wichtig: Compile-Angaben unbedingt wie folgt definieren:
-// compile group: 'xxx', name: 'yyy'...
-// Solche Angaben erlauben ClassPath für Manifest zu ermitteln
-// (im Manifest wird 'name' verwendet).
 //--------------------------------------------------------------------
 dependencies {
     //------
     // Source:
-    // libGlobal:
-    sweLibGlobal.each{
-        lib -> compile group: 'libExtern', name: lib.name, version: '+'
-    }
     // libExtern:
     compile group: 'libExtern', name: 'de.bsvrz.dav.daf', version: '+'
     compile group: 'libExtern', name: 'de.bsvrz.sys.funclib.debug', version: '+'
@@ -93,7 +82,6 @@ sourceSets {
             exclude { 'nichtVorhanden.txt' }
         }
     }
-
 }
 //--------------------------------------------------------------------
 // Import der build-swe.gradle
