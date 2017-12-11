@@ -60,7 +60,7 @@ import java.util.Timer;
 /**
  * Implementiert einen TestServer für TLSoIP, mit dem ein SM simuliert werden kann, welches über TLSoIP angebunden wird
  * und als Server fungiert.
- * <p/>
+ * <p>
  * Folgende Funktionen werden unterstützt: <ul> <li>Verbindungseinstellungen werden aus dem übergebenen Anschlusspunkt
  * übernommen.</li> <li></li> <li></li> <li></li> <li></li> </ul>
  *

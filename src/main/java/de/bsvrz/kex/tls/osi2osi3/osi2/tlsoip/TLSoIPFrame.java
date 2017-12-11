@@ -42,7 +42,7 @@ import java.nio.ByteBuffer;
 
 /**
  * Telegrammrahmen für ein TLSoIP-Telegramm, welches aus Header und Daten besteht.
- * <p/>
+ * <p>
  * Genaue Beschreibung des Aufbaus siehe TLS 2009 "Datenübertragung über TCP/IP (TLSoIP)".
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
@@ -149,7 +149,8 @@ public class TLSoIPFrame {
 
     /**
      * Liest aus dem übergebenen Buffer die Bytes in den Datenteil des Telegramms. Die Anzahl der zu lesenden Bytes werden
-     * aus der Längenangabe des Headers ermittelt. <p< Liegen nicht genügend Bytes im Buffer vor, wird der Datenteil auf
+     * aus der Längenangabe des Headers ermittelt.
+     * <p> Liegen nicht genügend Bytes im Buffer vor, wird der Datenteil auf
      * <code>null</code> gesetzt.
      *
      * @param readBuffer Der Buffer mit den Nutzdaten des Telegramms.

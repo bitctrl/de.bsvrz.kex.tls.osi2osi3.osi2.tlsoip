@@ -1,73 +1,61 @@
-//--------------------------------------------------------------------------------//
-// Diese Datei enthält alle SWE-spezifische Angaben // h i e r   a n p a s s e n  //
-//--------------------------------------------------------------------------------//
-apply plugin: 'java'
+//--------------------------------------------------------------------
+// NERZ-SWE-Plugin
+//--------------------------------------------------------------------
+plugins {
+    id "de.bsvrz.gradle.nerzswe" version "0.3.0"
+}
 
-// Import der build-swe-setting.gradle
-apply from: '../SWE_build.gradle/basis-skripte/build-swe-setting.gradle'
-
-//================================================================================
+//--------------------------------------------------------------------
 // SWE-Eigenschaften
-//================================================================================
-ext{
-    sweJavaVersion='1.8'
-    // Status: ZERT, FREI, BETA, PROT, EXPT
-    sweStatus='FREI'
-    // Version
-    sweVersion='V2.1.1'
-    // Group
-    sweGroup='de.bsvrz.kex'
-    // Angabe der Lizenzen für diese SWE, i.d.R.: "GPL" oder "LGPL"
-    // Verwendet wird die Datei aus dem Ordner "SWE_build.gradle/lizenzen/",
-    // die dem Lizenznamen.txt entspricht (bei "GPL" also die Datei "GPL.txt")
-    sweLizenz='GPL'
-    // Legt die Main-Klasse für die Erstellung des Manifests fest
-    sweMainClass='main.klasse.nicht.Definiert'
+//--------------------------------------------------------------------
+description 'ToDo' //TODO
+group 'de.bsvrz.kex'
+version '2.1.1'
+
+// Properties des NERZ-SWE-Plugins:
+nerzswe {
+    mainClassName = ''
+    sweStatus = 'FREI'
+    // TODO anpassen:
+    sweDatum = '2017-11-29'
 }
 
-//================================================================================
-// Dependencies
-//================================================================================
-//--------------------------------------------------------------------
-// Angabe der benötigten globalen Libs für diese SWE:
-// - für Distribution
-// - für ClassPath in der Manifest-Datei
-// (Variablen können leer sein, aber müssen definiert werden)
-//--------------------------------------------------------------------
-ext {
-    // Angabe der Dateien, die in die Distribution kopiert werden sollen
-    // (alle Daten aus pfad/dir werden in Distribution/lib/dir kopiert):
-    sweLibGlobalDistr = [
-            //[pfad: 'lib', dir: 'libName']
-     ]
-    // Angabe der jar-Dateien für Manifest:
-    sweLibGlobal = [
-            //[dir: 'global.junit', name: 'junit-4.8.1']
-     ]
+// Konfiguration:
+project.afterEvaluate{
+    // JavaDoc ausschalten:
+    //project.tasks.javadoc.onlyIf { false }
+    // FindBugs ausschalten:
+    project.findbugs {
+        sourceSets = []
+    }
 }
+
+//--------------------------------------------------------------------
+// Repositories
+//--------------------------------------------------------------------
+repositories {
+    maven { url 'http://h2727649.stratoserver.net:8081/repository/nerz-maven-public/' }}
+
 //--------------------------------------------------------------------
 // Abhängigkeiten
 //--------------------------------------------------------------------
+String kernsoftwareVersion = '3.9.2'
 dependencies {
     //------
     // Source:
-    // libExtern:
-    compile group: 'libExtern', name: 'de.bsvrz.dav.daf', version: '+'
-    compile group: 'libExtern', name: 'de.bsvrz.sys.funclib.debug', version: '+'
-    compile group: 'libExtern', name: 'de.bsvrz.sys.funclib.commandLineArgs', version: '+'
-    compile group: 'libExtern', name: 'de.bsvrz.sys.funclib.concurrent', version: '+'
-    compile group: 'libExtern', name: 'de.bsvrz.sys.funclib.hexdump', version: '+'
-    compile group: 'libExtern', name: 'de.bsvrz.kex.tls.osi2osi3', version: '+'
-    compile group: 'libExtern', name: 'de.bsvrz.pat.onlprot', version: '+'
+    compile group: 'de.bsvrz.dav', name: 'de.bsvrz.dav.daf', version: kernsoftwareVersion
+    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.debug', version: kernsoftwareVersion
+    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.commandLineArgs', version: kernsoftwareVersion
+    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.concurrent', version: kernsoftwareVersion
+    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.hexdump', version: kernsoftwareVersion
+    compile group: 'de.bsvrz.kex', name: 'de.bsvrz.kex.tls.osi2osi3', version: kernsoftwareVersion
+    compile group: 'de.bsvrz.pat', name: 'de.bsvrz.pat.onlprot', version: kernsoftwareVersion
     //------
     // Test:
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'libExtern', name: 'de.bsvrz.sys.funclib.application', version: '+'
+    testCompile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.application', version: kernsoftwareVersion
 }
 
-//================================================================================
-// Andere Angaben
-//================================================================================
 //--------------------------------------------------------------------
 // Source
 //--------------------------------------------------------------------
@@ -83,8 +71,3 @@ sourceSets {
         }
     }
 }
-//--------------------------------------------------------------------
-// Import der build-swe.gradle
-//--------------------------------------------------------------------
-apply from: sweBuildDatei
-//--------------------------------------------------------------------

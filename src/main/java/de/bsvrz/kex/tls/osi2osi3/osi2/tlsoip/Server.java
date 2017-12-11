@@ -72,42 +72,41 @@ import java.util.TimerTask;
 
 /**
  * Klasse, die als OSI-2 Protokollmodul für den Server-seitigen Teil einer TLSoIP-Verbindung eingesetzt werden kann.
- * <p/>
+ * <p>
  * Zur Verwendung dieses Protokollmoduls ist an dem jeweiligen Anschlusspunkt in der Konfiguration in der Attributgruppe
  * "atg.anschlussPunkt" im Attribut "ProtokollTyp" der Wert "de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip.Server" einzutragen.
- * <p/>
+ * <p>
  * Im Parameter "atg.protokollEinstellungenStandard" des Anschlußpunkts können die Standardwerte für alle Verbindungen
  * an diesem Anschlußpunkt eingestellt.
- * <p/>
+ * <p>
  * Im Parameter "atg.protokollEinstellungenPrimary" der dem Anschlußpunkt zugeordneten
  * AnschlußPunktKommunikationsPartner können individuelle Werte für die Verbindung zum jeweiligen Kommunikationspartner
  * eingestellt werden.
- * <p/>
+ * <p>
  * Die Parameterdatensätze können dabei mehrere Einträge enthalten, die jeweils aus einem Namen und einem Wert
  * bestehen.
- * <p/>
+ * <p>
  * Folgende Einträge werden unterstützt (siehe auch TLS 2009, Teil 2, Datenübertragung über TCP/IP (TLSoIP):
- * <p/>
+ * <p>
  * Verbindungsparameter für beide Verbindungspartner:
- * <p/>
- * <table cellpadding="2" cellspacing="2" border="1"> <tr> <th> Name </th> <th> Defaultwert </th> <th> Beschreibung
+ *
+ * <table cellpadding="2" cellspacing="2" border="1" summary=""> <tr> <th> Name </th> <th> Defaultwert </th> <th> Beschreibung
  * </th> </tr> <tr> <td> tlsoip.C_HelloDelay </td> <td> 30 </td> <td> Zeit [s], nach der ein Keep-Alive-Telegramm an die
  * Gegenstelle versendet werden muss (0=ausgeschaltet für Testzwecke, 1...3599). </td> </tr> <tr> <td>
  * tlsoip.C_HelloTimeout </td> <td> 60 </td> <td> Zeit [s], nach der spätestens ein Keep-Alive-Telegramm der Gegenstelle
- * erwartet wird ( > C_HelloDelay der Gegenstelle), (0=ausgeschaltet für Testzwecke, 1...3600). </td> </tr> <tr> <td>
+ * erwartet wird ( &gt; C_HelloDelay der Gegenstelle), (0=ausgeschaltet für Testzwecke, 1...3600). </td> </tr> <tr> <td>
  * tlsoip.C_ReceiptCount </td> <td> 10 </td> <td> Anzahl empfangener/gesendeter Telegramme, nach der spätestens ein
  * Quittungstelegramm versendet werden muss/erwartet wird (1..255). </td> </tr> <tr> <td> tlsoip.C_ReceiptDelay </td>
  * <td> 15 </td> <td> Zeit [s], nach der nach Erhalt eines Telegramms spätenstens ein Quittierungstelegramm an die
  * Gegenstelle versendet werden muss (1..59). </td> </tr> <tr> <td> tlsoip.C_ReceiptTimeout </td> <td> 30 </td> <td>
- * Zeit [s], nach der spätestens ein Quittungstelegramm von der Gegenstelle erwartet wird (> C_ReceiptDelay der
+ * Zeit [s], nach der spätestens ein Quittungstelegramm von der Gegenstelle erwartet wird (&gt; C_ReceiptDelay der
  * Gegenstelle) (1..60). </td> </tr> <tr> <td> tlsoip.C_SecureConnection </td> <td> nein </td> <td> WIRD AKTUELL NICHT
  * UNTERSTÜTZT (immer nein): Verbindung wird ohne SSL betrieben (nein), Verbindung wird mit SSL betrieben (ja). </td>
  * </tr> </table>
- * <p/>
- * <p/>
+ *
  * Verbindungsparameter für den Server:
- * <p/>
- * <table cellpadding="2" cellspacing="2" border="1"> <tr> <th> Name </th> <th> Defaultwert </th> <th> Beschreibung
+ *
+ * <table cellpadding="2" cellspacing="2" border="1" summary=""> <tr> <th> Name </th> <th> Defaultwert </th> <th> Beschreibung
  * </th> </tr> <tr> <td> tlsoip.C_AcceptPort </td> <td>  </td> <td> Dynamische und oder Private Ports (49152 bis 65535)
  * gemäß IANA konfigurierbar, auf dem der Server anfragen entgegen nimmt. </td> </tr> <tr> <td> tlsoip.C_PortMode </td>
  * <td> aktiv </td> <td> AKTUELL WIRD NUR "AKTIV" UNTERSTÜTZT!<br> Portmodus (aktiv/passiv). Passiv nur für
@@ -120,7 +119,7 @@ import java.util.TimerTask;
  * Übertragung der Telegramme in Antwortrichtung (ja/nein). </td> </tr> <tr> <td> tlsoip.C_TelTypeList </td> <td>  </td>
  * <td> WIRD AKTUELL NICHT UNTERSTÜTZT!<br> Bei passiven Ports: Liste der erlaubten TelType (OSI-2 TLSoIP). </td> </tr>
  * </table>
- * <p/>
+ * <p>
  *
  * @author inovat, innovative systeme - verkehr - tunnel - technik
  * @author Dipl.-Ing. Hans Christian Kniß (HCK)
