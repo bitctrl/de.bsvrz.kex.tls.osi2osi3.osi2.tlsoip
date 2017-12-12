@@ -39,21 +39,21 @@ repositories {
 //--------------------------------------------------------------------
 // Abhängigkeiten
 //--------------------------------------------------------------------
-String kernsoftwareVersion = '3.9.2'
+String kernsoftware_version = '3.9.2'
 dependencies {
     //------
     // Source:
-    compile group: 'de.bsvrz.dav', name: 'de.bsvrz.dav.daf', version: kernsoftwareVersion
-    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.debug', version: kernsoftwareVersion
-    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.commandLineArgs', version: kernsoftwareVersion
-    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.concurrent', version: kernsoftwareVersion
-    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.hexdump', version: kernsoftwareVersion
-    compile group: 'de.bsvrz.kex', name: 'de.bsvrz.kex.tls.osi2osi3', version: kernsoftwareVersion
-    compile group: 'de.bsvrz.pat', name: 'de.bsvrz.pat.onlprot', version: kernsoftwareVersion
+    compile group: 'de.bsvrz.dav', name: 'de.bsvrz.dav.daf', version: kernsoftware_version
+    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.debug', version: kernsoftware_version
+    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.commandLineArgs', version: kernsoftware_version
+    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.concurrent', version: kernsoftware_version
+    compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.hexdump', version: kernsoftware_version
+    compile group: 'de.bsvrz.kex', name: 'de.bsvrz.kex.tls.osi2osi3', version: kernsoftware_version
+    compile group: 'de.bsvrz.pat', name: 'de.bsvrz.pat.onlprot', version: kernsoftware_version
     //------
     // Test:
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.application', version: kernsoftwareVersion
+    testCompile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.application', version: kernsoftware_version
 }
 
 //--------------------------------------------------------------------
