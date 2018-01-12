@@ -2,38 +2,27 @@
 // NERZ-SWE-Plugin
 //--------------------------------------------------------------------
 plugins {
-    id "de.bsvrz.gradle.nerzswe" version "0.4.0"
+    id "de.bsvrz.gradle.nerzswe" version "0.7.0"
 }
 
 //--------------------------------------------------------------------
 // SWE-Eigenschaften
 //--------------------------------------------------------------------
-description 'ToDo' //TODO
+description 'Umsetzung des Kommunikationsprotokolls gemäß [TLS2012]'
 group 'de.bsvrz.kex'
-version '2.1.1'
+version '2.1.2-SNAPSHOT'
 
 // Properties des NERZ-SWE-Plugins:
 nerzswe {
     mainClassName = ''
-    sweStatus = 'FREI'
-    // TODO anpassen:
-    sweDatum = '2017-11-29'
-}
-
-// Konfiguration:
-project.afterEvaluate{
-    // JavaDoc ausschalten:
-    //project.tasks.javadoc.onlyIf { false }
-    // FindBugs ausschalten:
-    project.findbugs {
-        sourceSets = []
-    }
+    sweStatus = 'BETA'
+    sweDatum = ''
 }
 
 //--------------------------------------------------------------------
 // Abhängigkeiten
 //--------------------------------------------------------------------
-String kernsoftware_version = '3.9.2'
+String kernsoftware_version = '3.9.7'
 dependencies {
     //------
     // Source:
@@ -42,30 +31,11 @@ dependencies {
     compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.commandLineArgs', version: kernsoftware_version
     compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.concurrent', version: kernsoftware_version
     compile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.hexdump', version: kernsoftware_version
-    compile group: 'de.bsvrz.kex', name: 'de.bsvrz.kex.tls.osi2osi3', version: kernsoftware_version
     compile group: 'de.bsvrz.pat', name: 'de.bsvrz.pat.onlprot', version: kernsoftware_version
+    //
+    compile group: 'de.bsvrz.kex', name: 'de.bsvrz.kex.tls.osi2osi3', version: '3.9.2'
     //------
     // Test:
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'de.bsvrz.sys', name: 'de.bsvrz.sys.funclib.application', version: kernsoftware_version
-}
-
-//--------------------------------------------------------------------
-// Source
-//--------------------------------------------------------------------
-sourceSets {
-    main {
-        resources {
-            exclude { 'nichtVorhanden.txt' }
-        }
-    }
-    test {
-        // TODO Achtung: Tests sind momentan wegen Testsfehler ausgeschaltet:
-        java {
-            exclude '*/**'
-        }
-        resources {
-            exclude { 'nichtVorhanden.txt' }
-        }
-    }
 }
