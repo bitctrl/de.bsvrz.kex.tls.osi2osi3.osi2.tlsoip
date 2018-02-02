@@ -1,0 +1,7 @@
+de.bsvrz.kex.osi2.osi3.tlsoip-build:
+    image:
+        openjdk:8-jdk-alpine
+        
+    script:
+      - ./gradlew build
+
