@@ -10,7 +10,7 @@ plugins {
 //--------------------------------------------------------------------
 description 'Umsetzung des Kommunikationsprotokolls gemäß [TLS2012]'
 group 'de.bsvrz.kex'
-version '2.1.2-SNAPSHOT'
+version '2.1.3-SNAPSHOT'
 
 // Properties des NERZ-SWE-Plugins:
 nerzswe {
