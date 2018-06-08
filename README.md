@@ -8,8 +8,8 @@ Protokoll TLSoverIP.
   
 ## Bemerkungen
 
-entfällt.
-
+Es handelt sich um einen angepassten Fork vom NERZ-Repository, da die angestrebten Änderungen für den
+produktiven Einsatz erforderlich waren.
 
 ## Disclaimer
 
