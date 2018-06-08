@@ -3,6 +3,7 @@ Versionsverlauf
 
 ## [Noch nicht veröffentlicht]
 
+- Polling im Client ersetzt, um die erzeugte CPU-Last zu verringern
 
 ## [Version 2.1.2]
 
