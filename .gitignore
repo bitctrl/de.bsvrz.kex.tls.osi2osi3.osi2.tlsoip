@@ -1,3 +1,9 @@
 # Created by .ignore support plugin (hsz.mobi)
 .gradle/
 build/
+
+# Eclipse-Files
+bin/
+.settings/
+.classpath
+.project
