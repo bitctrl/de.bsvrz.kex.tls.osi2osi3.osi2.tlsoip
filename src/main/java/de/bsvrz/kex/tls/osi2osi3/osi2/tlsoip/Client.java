@@ -30,6 +30,26 @@
 
 package de.bsvrz.kex.tls.osi2osi3.osi2.tlsoip;
 
+//~ JDK IMPORTE ===============================================================
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 //~ NICHT JDK IMPORTE =========================================================
 
 import de.bsvrz.dav.daf.main.ClientDavInterface;
@@ -41,30 +61,8 @@ import de.bsvrz.kex.tls.osi2osi3.properties.PropertyConsultant;
 import de.bsvrz.kex.tls.osi2osi3.properties.PropertyQueryInterface;
 import de.bsvrz.sys.funclib.concurrent.PriorityChannel;
 import de.bsvrz.sys.funclib.concurrent.PriorizedObject;
-import de.bsvrz.sys.funclib.concurrent.UnboundedQueue;
 import de.bsvrz.sys.funclib.debug.Debug;
 import de.bsvrz.sys.funclib.hexdump.HexDumper;
-
-//~ JDK IMPORTE ===============================================================
-
-import java.io.IOException;
-
-import java.net.InetSocketAddress;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
-
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 //~ KLASSEN ===================================================================
 
@@ -1434,7 +1432,7 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
         private final Selector _selector;
 
         /** Queue zur Übermittlung von Aktionen an den Protokoll-Thread */
-        private final UnboundedQueue<WorkAction> _workQueue;
+		private final BlockingQueue<WorkAction> workQueue = new LinkedBlockingQueue<>();
 
         //~ KONSTRUKTOREN  (und vom Konstruktor verwendete Methoden) ==========
 
@@ -1445,7 +1443,6 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
          */
         public Worker() throws IOException {
             _selector  = Selector.open();
-            _workQueue = new UnboundedQueue<WorkAction>();
         }
 
         //~ METHODEN ==========================================================
@@ -1463,9 +1460,13 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
          *                         <code>false</code>.
          */
         public void notify(Link link, ActionType action, int seqNum, boolean sofortQuittieren) {
-            _workQueue.put(new WorkAction(link, action, seqNum, sofortQuittieren));
-            DEBUG.finer("Aufruf von _selector.wakeup()");
-            _selector.wakeup();
+            try {
+				workQueue.put(new WorkAction(link, action, seqNum, sofortQuittieren));
+	            DEBUG.finer("Aufruf von _selector.wakeup()");
+	            _selector.wakeup();
+			} catch (InterruptedException e) {
+				DEBUG.warning(e.getLocalizedMessage(), e);
+			}
         }
 
         // ToDo freigeben nach Test: ###Ende: Geändert STS auf Client
@@ -1522,11 +1523,8 @@ public class Client extends TLSoIP implements PropertyQueryInterface {
                     } else if ((state == ProtocolState.STARTED) || (state == ProtocolState.STOPPING)) {
                         DEBUG.finest(String.format("Protokoll arbeitet: %s", this));
 
-                        WorkAction action;
-
-                        while (null != (action = _workQueue.poll(0))) {
-                            action._link.handleAction(action._action, _selector, action._seqNum, action._sofortQuittieren);
-                        }
+                        WorkAction action = workQueue.take();
+                        action._link.handleAction(action._action, _selector, action._seqNum, action._sofortQuittieren);
 
                         try {
                             DEBUG.finest("Aufruf von select()");
